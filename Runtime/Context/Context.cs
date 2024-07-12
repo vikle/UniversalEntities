@@ -7,12 +7,16 @@ namespace UniversalEntities
 {
     public sealed class Context : IContext, IContextBinding, IContextRuntime
     {
-        readonly List<IEntity> m_entities = new(4);
-        readonly List<ISystem> m_allSystems = new(8);
-        readonly List<IUpdateSystem> m_updateSystems = new(8);
+        readonly List<IEntity> m_entities = new(32);
+        
+        readonly List<ISystem> m_allSystems = new(128);
+        readonly List<IFixedUpdateSystem> m_fixedUpdateSystems = new(16);
+        readonly List<IUpdateSystem> m_updateSystems = new(32);
+        readonly List<ILateUpdateSystem> m_lateUpdateSystems = new(16);
         readonly List<IEntityInitializeSystem> m_entityInitializeSystems = new(8);
         readonly List<IEntityTerminateSystem> m_entityTerminateSystems = new(8);
-        ArrayList m_injectionsCache = new(8);
+        
+        ArrayList m_injectionsCache = new(16);
 
         public IEntity CreateEntity<T>() where T : class, IEntity, new()
         {
@@ -70,8 +74,14 @@ namespace UniversalEntities
         
             switch (bin_system)
             {
+                case IFixedUpdateSystem fixed_update_system: 
+                    m_fixedUpdateSystems.Add(fixed_update_system);
+                    break;
                 case IUpdateSystem update_system: 
                     m_updateSystems.Add(update_system);
+                    break;
+                case ILateUpdateSystem late_update_system: 
+                    m_lateUpdateSystems.Add(late_update_system);
                     break;
                 case IEntityInitializeSystem enabled_system: 
                     m_entityInitializeSystems.Add(enabled_system);
@@ -103,30 +113,36 @@ namespace UniversalEntities
         {
             if (m_injectionsCache.Count == 0) return;
             
-            const BindingFlags k_binding_flags = (BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            
             for (int i = 0, i_max = m_allSystems.Count; i < i_max; i++)
             {
                 var system = m_allSystems[i];
-                var system_fields = system.GetType().GetFields(k_binding_flags);
-
-                for (int j = 0, j_max = system_fields.Length; j < j_max; j++)
-                {
-                    var field = system_fields[j];
-                    var field_type = field.FieldType;
-                    
-                    for (int k = 0, k_max = m_injectionsCache.Count; k < k_max; k++)
-                    {
-                        object injection = m_injectionsCache[k];
-                        if (field_type.IsInstanceOfType(injection) == false) continue;
-                        field.SetValue(system, injection);
-                        break;
-                    }
-                }
+                InjectDependenciesIn(system);
             }
             
             m_injectionsCache.Clear();
             m_injectionsCache = null;
+        }
+
+        private void InjectDependenciesIn(object obj)
+        {
+            const BindingFlags k_binding_attr = (BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            
+            var obj_type = obj.GetType();
+            var obj_fields = obj_type.GetFields(k_binding_attr);
+
+            for (int i = 0, i_max = obj_fields.Length; i < i_max; i++)
+            {
+                var field = obj_fields[i];
+                var field_type = field.FieldType;
+                    
+                for (int j = 0, j_max = m_injectionsCache.Count; j < j_max; j++)
+                {
+                    object injection = m_injectionsCache[j];
+                    if (field_type.IsInstanceOfType(injection) == false) continue;
+                    field.SetValue(obj, injection);
+                    break;
+                }
+            }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -140,13 +156,31 @@ namespace UniversalEntities
                 }
             }
         }
-    
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void OnFixedUpdate()
+        {
+            for (int i = 0, i_max = m_fixedUpdateSystems.Count; i < i_max; i++)
+            {
+                m_fixedUpdateSystems[i].OnFixedUpdate(this);
+            }
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void OnUpdate()
         {
             for (int i = 0, i_max = m_updateSystems.Count; i < i_max; i++)
             {
                 m_updateSystems[i].OnUpdate(this);
+            }
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void OnLateUpdate()
+        {
+            for (int i = 0, i_max = m_lateUpdateSystems.Count; i < i_max; i++)
+            {
+                m_lateUpdateSystems[i].OnLateUpdate(this);
             }
         }
 

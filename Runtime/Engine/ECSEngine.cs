@@ -29,10 +29,21 @@ namespace UniversalEntities
             s_runtime.OnStart();
         }
 
+        void FixedUpdate()
+        {
+            TimeData.OnFixedUpdate();
+            s_runtime.OnFixedUpdate();
+        }
+
         void Update()
         {
             TimeData.OnUpdate();
             s_runtime.OnUpdate();
+        }
+
+        void LateUpdate()
+        {
+            s_runtime.OnLateUpdate();
         }
     };
 }
