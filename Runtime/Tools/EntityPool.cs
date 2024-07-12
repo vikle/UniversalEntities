@@ -1,10 +1,10 @@
 ﻿namespace UniversalEntities
 {
-    public sealed class EntityFactory : ObjectPool<IEntity>
+    public sealed class EntityPool : ObjectPool<IEntity>
     {
-        public static T GetInstance<T>() where T : class, IEntity, new()
+        public static T Get<T>() where T : class, IEntity, new()
         {
-            return GetInstanceInternal<T>();
+            return GetInternal<T>();
         }
         
         public static void Release<T>(T instance) where T : class, IEntity

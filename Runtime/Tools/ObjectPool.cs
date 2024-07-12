@@ -7,7 +7,7 @@ namespace UniversalEntities
     {
         static readonly Dictionary<Type, Stack<TType>> sr_pool = new(64);
         
-        protected static TValue GetInstanceInternal<TValue>() where TValue : class, TType, new()
+        protected static TValue GetInternal<TValue>() where TValue : class, TType, new()
         {
             var pool_type = typeof(TValue);
 

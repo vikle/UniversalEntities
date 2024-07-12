@@ -26,21 +26,23 @@ namespace UniversalEntities
                 switch (state)
                 {
                     case EPromiseState.Fulfilled:
+                        var target = promise.Target;
                         for (int i = 0, i_max = resolve.Count; i < i_max; i++)
                         {
-                            entity.Add(resolve[i]);
+                            target.Add(resolve[i]);
                         }
                         break;
                     case EPromiseState.Rejected: 
                         for (int i = 0, i_max = resolve.Count; i < i_max; i++)
                         {
-                            FragmentFactory.Release(resolve[i]);
+                            FragmentPool.Release(resolve[i]);
                         }
                         break; 
                 }
 
-                entity.Remove<T>();
+                entity.Remove(promise);
                 promise.State = EPromiseState.Pending;
+                promise.Target = null;
                 resolve.Clear();
             }
         }

@@ -20,7 +20,7 @@ namespace UniversalEntities
 
         public IEntity CreateEntity<T>() where T : class, IEntity, new()
         {
-            var entity = EntityFactory.GetInstance<T>();
+            var entity = EntityPool.Get<T>();
             AddEntity(entity);
             return entity;
         }

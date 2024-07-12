@@ -20,14 +20,16 @@ namespace UniversalEntities
         
         public T Then<T>() where T : class, IPromise, new()
         {
-            return Add<T>();
+            var promise = Add<T>();
+            promise.Target = this;
+            return promise;
         }
 
-        public void Reject<T>() where T : class, IPromise
+        public void Mark<T>(EPromiseState newState) where T : class, IPromise
         {
             if (TryGet(out T promise))
             {
-                promise.State = EPromiseState.Rejected;
+                promise.State = newState;
             }
         }
         
@@ -40,7 +42,7 @@ namespace UniversalEntities
                 return instance;
             }
             
-            instance = FragmentFactory.GetInstance<T>();
+            instance = FragmentPool.Get<T>();
             m_fragmentsMap[type] = instance;
             
             return instance;
@@ -83,7 +85,7 @@ namespace UniversalEntities
             if (instance == null) return;
             
             RemoveFromMap(instance);
-            FragmentFactory.Release(instance);
+            FragmentPool.Release(instance);
         }
         
         public void Remove(EntityActorComponent instance)
@@ -102,11 +104,11 @@ namespace UniversalEntities
 
         public void Dispose()
         {
-            EntityFactory.Release(this);
+            EntityPool.Release(this);
             
             foreach (var instance in m_fragmentsMap.Values)
             {
-                FragmentFactory.Release(instance);
+                FragmentPool.Release(instance);
             }
             
             m_fragmentsMap.Clear();
