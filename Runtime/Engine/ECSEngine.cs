@@ -5,7 +5,7 @@ namespace UniversalEntities
     [DefaultExecutionOrder(-100), DisallowMultipleComponent]
     public sealed class ECSEngine : MonoBehaviour
     {
-        public MonoBehaviour bootstrap;
+        public ECSBootstrap bootstrap;
         
         public static IContext Context { get; private set; }
         static IContextRuntime s_runtime;
@@ -16,9 +16,9 @@ namespace UniversalEntities
             Context = context;
             s_runtime = context;
             
-            if (bootstrap is IECSBootstrap ecs_bootstrap)
+            if (bootstrap != null)
             {
-                ecs_bootstrap.OnBootstrap(context);
+                bootstrap.OnBootstrap(context);
             }
             
             context.Init();
