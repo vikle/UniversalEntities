@@ -1,23 +1,24 @@
 {
   "name": "com.vikle.universal-entities",
   "displayName": "Universal Entities",
+   "description": "Lightweight and easy-to-use ECS (Entity Component System) framework for Unity.",
   "version": "1.0.0",
-  "unity": "2020.3",
-  "description": "Lightweight and easy-to-use ECS (Entity Component System) framework for Unity.",
+  "unity": "2020.3", 
+  "license": "MIT",
+  "repository": {
+    "url": "https://github.com/vikle/UniversalEntities.git",
+	"type": "git"
+  },
   "author": {
     "name": "vikle",
     "email": "",
     "url": "https://github.com/vikle"
   },
   "keywords": [
-    "Unity",
-    "ECS",
-    "Entity",
-	"Component",
-	"System"
-  ],
-  "license": "MIT",
-  "repository": {
-    "url": "https://github.com/vikle/UniversalEntities.git"
-  }
+    "unity",
+    "ecs",
+    "entity",
+	"component",
+	"system"
+  ]
 }
