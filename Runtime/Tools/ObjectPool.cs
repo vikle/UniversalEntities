@@ -5,7 +5,7 @@ namespace UniversalEntities
 {
     public abstract class ObjectPool<TType> where TType : class
     {
-        static readonly Dictionary<Type, Stack<TType>> sr_pool = new(64);
+        static readonly Dictionary<Type, Stack<TType>> sr_pool = new Dictionary<Type, Stack<TType>>(64);
         
         protected static TValue GetInternal<TValue>() where TValue : class, TType, new()
         {
@@ -17,12 +17,12 @@ namespace UniversalEntities
             {
                 instance = (stack.Count > 0) 
                     ? (TValue)stack.Pop() 
-                    : new();
+                    : new TValue();
             }
             else
             {
-                instance = new();
-                sr_pool[pool_type] = new();
+                instance = new TValue();
+                sr_pool[pool_type] = new Stack<TType>();
             }
             
             return instance;
@@ -34,7 +34,7 @@ namespace UniversalEntities
 
             if (sr_pool.TryGetValue(pool_type, out var stack) == false)
             {
-                stack = new();
+                stack = new Stack<TType>();
                 sr_pool[pool_type] = stack;
             }
             

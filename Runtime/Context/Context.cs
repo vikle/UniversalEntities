@@ -7,16 +7,16 @@ namespace UniversalEntities
 {
     public sealed class Context : IContext, IContextBinding, IContextRuntime
     {
-        readonly List<IEntity> m_entities = new(32);
+        readonly List<IEntity> m_entities = new List<IEntity>(32);
         
-        readonly List<ISystem> m_allSystems = new(128);
-        readonly List<IFixedUpdateSystem> m_fixedUpdateSystems = new(16);
-        readonly List<IUpdateSystem> m_updateSystems = new(32);
-        readonly List<ILateUpdateSystem> m_lateUpdateSystems = new(16);
-        readonly List<IEntityInitializeSystem> m_entityInitializeSystems = new(8);
-        readonly List<IEntityTerminateSystem> m_entityTerminateSystems = new(8);
+        readonly List<ISystem> m_allSystems = new List<ISystem>(128);
+        readonly List<IFixedUpdateSystem> m_fixedUpdateSystems = new List<IFixedUpdateSystem>(16);
+        readonly List<IUpdateSystem> m_updateSystems = new List<IUpdateSystem>(32);
+        readonly List<ILateUpdateSystem> m_lateUpdateSystems = new List<ILateUpdateSystem>(16);
+        readonly List<IEntityInitializeSystem> m_entityInitializeSystems = new List<IEntityInitializeSystem>(8);
+        readonly List<IEntityTerminateSystem> m_entityTerminateSystems = new List<IEntityTerminateSystem>(8);
         
-        ArrayList m_injectionsCache = new(16);
+        ArrayList m_injectionsCache = new ArrayList(16);
 
         public IEntity CreateEntity<T>() where T : class, IEntity, new()
         {
@@ -187,7 +187,7 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ContextEnumerator GetEnumerator()
         {
-            return new(m_entities);
+            return new ContextEnumerator(m_entities);
         }
     };
 }

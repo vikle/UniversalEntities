@@ -5,7 +5,7 @@ namespace UniversalEntities
 {
     public sealed class Entity : IEntity
     {
-        readonly Dictionary<Type, IFragment> m_fragmentsMap = new(8);
+        readonly Dictionary<Type, IFragment> m_fragmentsMap = new Dictionary<Type, IFragment>(8);
         
         public bool Has<T>() where T : class, IFragment
         {

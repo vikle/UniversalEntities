@@ -65,7 +65,10 @@ namespace UniversalEntities
 
         private void InitAttachedComponents()
         {
-            m_attachedComponents ??= GetComponents<EntityActorComponent>();
+            if (m_attachedComponents == null)
+            {
+                m_attachedComponents = GetComponents<EntityActorComponent>();
+            }
         }
     };
 }
