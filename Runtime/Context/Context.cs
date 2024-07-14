@@ -3,8 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
+#if ENABLE_IL2CPP
+    using Unity.IL2CPP.CompilerServices;
+#endif
+
 namespace UniversalEntities
 {
+#if ENABLE_IL2CPP
+    [Il2CppSetOption(Option.NullChecks, false)]
+    [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+#endif
     public sealed class Context : IContext, IContextBinding, IContextRuntime
     {
         readonly List<IEntity> m_entities = new List<IEntity>(32);
@@ -18,6 +26,7 @@ namespace UniversalEntities
         
         ArrayList m_injectionsCache = new ArrayList(16);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEntity CreateEntity<T>() where T : class, IEntity, new()
         {
             var entity = EntityPool.Get<T>();
@@ -25,12 +34,14 @@ namespace UniversalEntities
             return entity;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void DestroyEntity(IEntity entity)
         {
             RemoveEntity(entity);
             entity.Dispose();
         }
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddEntity(IEntity entity)
         {
             if (m_entities.Contains(entity)) return;
@@ -43,6 +54,7 @@ namespace UniversalEntities
             m_entities.Add(entity);
         }
     
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void RemoveEntity(IEntity entity)
         {
             int entity_id = m_entities.IndexOf(entity);
@@ -65,7 +77,7 @@ namespace UniversalEntities
         {
             return BindSystem<PromiseCollector<T>>();
         }
-    
+        
         public IContextBinding BindSystem<T>() where T : class, ISystem, new()
         {
             var bin_system = new T();

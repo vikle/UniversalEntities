@@ -1,23 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+
+#if ENABLE_IL2CPP
+    using Unity.IL2CPP.CompilerServices;
+#endif
 
 namespace UniversalEntities
 {
+#if ENABLE_IL2CPP
+    [Il2CppSetOption(Option.NullChecks, false)]
+    [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+#endif
     public sealed class Entity : IEntity
     {
         readonly Dictionary<Type, IFragment> m_fragmentsMap = new Dictionary<Type, IFragment>(8);
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Has<T>() where T : class, IFragment
         {
             var type = typeof(T);
             return m_fragmentsMap.ContainsKey(type);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Trigger<T>() where T : class, IEvent, new()
         {
             return Add<T>();
         }
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Then<T>() where T : class, IPromise, new()
         {
             var promise = Add<T>();
@@ -25,6 +37,7 @@ namespace UniversalEntities
             return promise;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Mark<T>(EPromiseState newState) where T : class, IPromise
         {
             if (TryGet(out T promise))
@@ -33,6 +46,7 @@ namespace UniversalEntities
             }
         }
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Add<T>() where T : class, IFragment, new()
         {
             var type = typeof(T);
@@ -48,6 +62,7 @@ namespace UniversalEntities
             return instance;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add<T>(T instance) where T : class, IFragment
         {
             if (instance == null) return;
@@ -56,6 +71,7 @@ namespace UniversalEntities
             m_fragmentsMap[type] = instance;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGet<T>(out T fragment) where T : class, IFragment
         {
             var type = typeof(T);
@@ -70,6 +86,7 @@ namespace UniversalEntities
             return false;
         }
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Remove<T>() where T : class, IFragment
         {
             var type = typeof(T);
@@ -80,6 +97,7 @@ namespace UniversalEntities
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Remove<T>(T instance) where T : class, IFragment
         {
             if (instance == null) return;
@@ -88,6 +106,7 @@ namespace UniversalEntities
             FragmentPool.Release(instance);
         }
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Remove(EntityActorComponent instance)
         {
             if (instance != null)
@@ -96,12 +115,14 @@ namespace UniversalEntities
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void RemoveFromMap(IFragment instance)
         {
             var type = instance.GetType();
             m_fragmentsMap.Remove(type);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
             EntityPool.Release(this);

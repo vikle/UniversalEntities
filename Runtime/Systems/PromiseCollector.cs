@@ -2,49 +2,50 @@
 
 namespace UniversalEntities
 {
-    public sealed class PromiseCollector<T> : IUpdateSystem where T : class, IPromise
+    public sealed class PromiseCollector<T> 
+        : Processor<T>
+        , IUpdateSystem where T : class, IPromise
     {
-        public void OnUpdate(IContext context)
+        protected override void OnExecute(IContext context, IEntity entity)
         {
-            foreach (var entity in context)
+            var promise = m_data1;
+            
+            List<IEvent> resolve;
+            var state = promise.State;
+
+            switch (state)
             {
-                if (!entity.TryGet(out T promise)) continue;
-
-                List<IEvent> resolve;
-                var state = promise.State;
-
-                switch (state)
-                {
-                    case EPromiseState.Fulfilled:
-                    case EPromiseState.Rejected: 
-                        resolve = promise.Resolve;
-                        break;
+                case EPromiseState.Fulfilled:
+                case EPromiseState.Rejected: 
+                    resolve = promise.Resolve;
+                    break;
                     
-                    default: continue;
-                }
-                
-                switch (state)
-                {
-                    case EPromiseState.Fulfilled:
-                        var target = promise.Target;
-                        for (int i = 0, i_max = resolve.Count; i < i_max; i++)
-                        {
-                            target.Add(resolve[i]);
-                        }
-                        break;
-                    case EPromiseState.Rejected: 
-                        for (int i = 0, i_max = resolve.Count; i < i_max; i++)
-                        {
-                            FragmentPool.Release(resolve[i]);
-                        }
-                        break; 
-                }
-
-                entity.Remove(promise);
-                promise.State = EPromiseState.Pending;
-                promise.Target = null;
-                resolve.Clear();
+                default: return;
             }
+                
+            switch (state)
+            {
+                case EPromiseState.Fulfilled:
+                    var target = promise.Target;
+                    for (int i = 0, i_max = resolve.Count; i < i_max; i++)
+                    {
+                        target.Add(resolve[i]);
+                    }
+                    break;
+                case EPromiseState.Rejected: 
+                    for (int i = 0, i_max = resolve.Count; i < i_max; i++)
+                    {
+                        FragmentPool.Release(resolve[i]);
+                    }
+                    break; 
+            }
+
+            resolve.Clear();
+            
+            promise.Target = null;
+            promise.State = EPromiseState.Pending;
+
+            entity.Remove(promise);
         }
     };
 }
