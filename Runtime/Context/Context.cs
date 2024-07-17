@@ -150,7 +150,7 @@ namespace UniversalEntities
                 for (int j = 0, j_max = m_injectionsCache.Count; j < j_max; j++)
                 {
                     object injection = m_injectionsCache[j];
-                    if (field_type.IsInstanceOfType(injection) == false) continue;
+                    if (!field_type.IsInstanceOfType(injection)) continue;
                     field.SetValue(obj, injection);
                     break;
                 }

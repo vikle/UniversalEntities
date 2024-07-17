@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 #if ENABLE_IL2CPP
@@ -54,5 +55,43 @@ namespace UniversalEntities
         {
             s_runtime.OnLateUpdate();
         }
+        
+#if UNITY_EDITOR
+        [UnityEditor.MenuItem("Tools/Universal Entities/Create/Engine", true)]
+        private static bool CanCreateEngine()
+        {
+            return (FindObjectOfType<ECSEngine>() == null);
+        }
+
+        [UnityEditor.MenuItem("Tools/Universal Entities/Create/Engine")]
+        private static void CreateEngine()
+        {
+            var obj_type = typeof(ECSEngine);
+            CreateGameObject(obj_type);
+        }
+
+        [UnityEditor.MenuItem("Tools/Universal Entities/Create/Bootstrap", true)]
+        private static bool CanCreateBootstrap()
+        {
+            return (FindObjectOfType<ECSBootstrap>() == null);
+        }
+
+        [UnityEditor.MenuItem("Tools/Universal Entities/Create/Bootstrap")]
+        private static void CreateBootstrap()
+        {
+            var obj_type = typeof(ECSBootstrap);
+            CreateGameObject(obj_type);
+        }
+
+        private static void CreateGameObject(Type objType)
+        {
+            var main_obj = new GameObject(objType.Name, objType)
+            {
+                isStatic = true
+            };
+            
+            UnityEditor.Selection.activeObject = main_obj;
+        }
+#endif
     };
 }
