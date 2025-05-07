@@ -79,3 +79,6 @@ crashlytics-build.properties
 
 # Screen Recordings
 /Recordings/
+
+#Mac OS Files
+*.DS_Store
