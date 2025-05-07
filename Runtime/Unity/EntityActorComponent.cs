@@ -2,7 +2,7 @@
 using UnityEngine;
 
 #if ENABLE_IL2CPP
-    using Unity.IL2CPP.CompilerServices;
+using Unity.IL2CPP.CompilerServices;
 #endif
 
 namespace UniversalEntities
@@ -14,17 +14,22 @@ namespace UniversalEntities
     [RequireComponent(typeof(EntityActor))]
     public abstract class EntityActorComponent : MonoBehaviour, IComponent
     {
-        [SerializeField]EntityActor m_actor;
+        [SerializeField]
+        EntityActor m_actor;
+        
         public EntityActor Actor
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => m_actor;
         }
-        
+
 #if UNITY_EDITOR
         protected virtual void OnValidate()
         {
-            if (m_actor == null) m_actor = GetComponent<EntityActor>();
+            if (m_actor == null)
+            {
+                m_actor = GetComponent<EntityActor>();
+            }
         }
 #endif
     };

@@ -43,12 +43,12 @@ namespace UniversalEntities
             
             InitAttachedComponents();
             
-            var entity = ECSEngine.Context.CreateEntity<Entity>();
+            var entity = UniversalEntitiesEngine.GetContext.CreateEntity<Entity>();
             
             for (int i = 0, i_max = m_attachedComponents.Length; i < i_max; i++)
             {
                 var instance = m_attachedComponents[i];
-                entity.Add(instance);
+                entity.AddComponent(instance);
             }
 
             Entity = entity;
@@ -60,12 +60,12 @@ namespace UniversalEntities
             
             if (entity == null) return;
 
-            ECSEngine.Context.DestroyEntity(entity);
+            UniversalEntitiesEngine.GetContext.DestroyEntity(entity);
             
             for (int i = 0, i_max = m_attachedComponents.Length; i < i_max; i++)
             {
                 var instance = m_attachedComponents[i];
-                entity.Remove(instance);
+                entity.RemoveComponent(instance);
             }
             
             Entity = null;

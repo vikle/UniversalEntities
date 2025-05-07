@@ -17,7 +17,7 @@ namespace UniversalEntities
         readonly Dictionary<Type, IFragment> m_fragmentsMap = new Dictionary<Type, IFragment>(8);
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Has<T>() where T : class, IFragment
+        public bool HasComponent<T>() where T : class, IFragment
         {
             var type = typeof(T);
             return m_fragmentsMap.ContainsKey(type);
@@ -26,13 +26,13 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Trigger<T>() where T : class, IEvent, new()
         {
-            return Add<T>();
+            return AddComponent<T>();
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Then<T>() where T : class, IPromise, new()
         {
-            var promise = Add<T>();
+            var promise = AddComponent<T>();
             promise.Target = this;
             return promise;
         }
@@ -40,14 +40,14 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Mark<T>(EPromiseState newState) where T : class, IPromise
         {
-            if (TryGet(out T promise))
+            if (TryGetComponent(out T promise))
             {
                 promise.State = newState;
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T Add<T>() where T : class, IFragment, new()
+        public T AddComponent<T>() where T : class, IFragment, new()
         {
             var type = typeof(T);
             
@@ -63,7 +63,7 @@ namespace UniversalEntities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Add<T>(T instance) where T : class, IFragment
+        public void AddComponent<T>(T instance) where T : class, IFragment
         {
             if (instance == null) return;
             
@@ -72,7 +72,7 @@ namespace UniversalEntities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryGet<T>(out T fragment) where T : class, IFragment
+        public bool TryGetComponent<T>(out T fragment) where T : class, IFragment
         {
             var type = typeof(T);
             
@@ -82,23 +82,23 @@ namespace UniversalEntities
                 return true;
             }
 
-            fragment = default;
+            fragment = null;
             return false;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Remove<T>() where T : class, IFragment
+        public void RemoveComponent<T>() where T : class, IFragment
         {
             var type = typeof(T);
             
             if (m_fragmentsMap.TryGetValue(type, out var instance))
             {
-                Remove(instance);
+                RemoveComponent(instance);
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Remove<T>(T instance) where T : class, IFragment
+        public void RemoveComponent<T>(T instance) where T : class, IFragment
         {
             if (instance == null) return;
             
@@ -107,7 +107,7 @@ namespace UniversalEntities
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Remove(EntityActorComponent instance)
+        public void RemoveComponent(EntityActorComponent instance)
         {
             if (instance != null)
             {

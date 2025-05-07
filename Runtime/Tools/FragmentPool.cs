@@ -1,6 +1,6 @@
 ﻿namespace UniversalEntities
 {
-    public sealed class FragmentPool : ObjectPool<IFragment>
+    internal sealed class FragmentPool : ObjectPool<IFragment>
     {
         public static T Get<T>() where T : class, IFragment, new()
         {

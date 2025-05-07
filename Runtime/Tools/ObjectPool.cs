@@ -11,7 +11,7 @@ namespace UniversalEntities
     [Il2CppSetOption(Option.NullChecks, false)]
     [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
-    public abstract class ObjectPool<TType> where TType : class
+    internal abstract class ObjectPool<TType> where TType : class
     {
         static readonly Dictionary<Type, Stack<TType>> sr_pool = new Dictionary<Type, Stack<TType>>(64);
         

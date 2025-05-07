@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 #if ENABLE_IL2CPP
-    using Unity.IL2CPP.CompilerServices;
+using Unity.IL2CPP.CompilerServices;
 #endif
 
 namespace UniversalEntities
@@ -13,16 +13,16 @@ namespace UniversalEntities
     [Il2CppSetOption(Option.NullChecks, false)]
     [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
-    public sealed class Context : IContext, IContextBinding, IContextRuntime
+    public sealed class Context
     {
         readonly List<IEntity> m_entities = new List<IEntity>(32);
-        
         readonly List<ISystem> m_allSystems = new List<ISystem>(128);
-        readonly List<IFixedUpdateSystem> m_fixedUpdateSystems = new List<IFixedUpdateSystem>(16);
-        readonly List<IUpdateSystem> m_updateSystems = new List<IUpdateSystem>(32);
-        readonly List<ILateUpdateSystem> m_lateUpdateSystems = new List<ILateUpdateSystem>(16);
-        readonly List<IEntityInitializeSystem> m_entityInitializeSystems = new List<IEntityInitializeSystem>(8);
-        readonly List<IEntityTerminateSystem> m_entityTerminateSystems = new List<IEntityTerminateSystem>(8);
+        
+        IFixedUpdateSystem[] m_fixedUpdateSystems;
+        IUpdateSystem[] m_updateSystems;
+        ILateUpdateSystem[] m_lateUpdateSystems;
+        IEntityInitializeSystem[] m_entityInitializeSystems;
+        IEntityTerminateSystem[] m_entityTerminateSystems;
         
         ArrayList m_injectionsCache = new ArrayList(16);
 
@@ -46,7 +46,7 @@ namespace UniversalEntities
         {
             if (m_entities.Contains(entity)) return;
 
-            for (int i = 0, i_max = m_entityInitializeSystems.Count; i < i_max; i++)
+            for (int i = 0, i_max = m_entityInitializeSystems.Length; i < i_max; i++)
             {
                 m_entityInitializeSystems[i].OnAfterEntityCreated(this, entity);
             }
@@ -62,51 +62,29 @@ namespace UniversalEntities
 
             m_entities.RemoveAt(entity_id);
             
-            for (int i = 0, i_max = m_entityTerminateSystems.Count; i < i_max; i++)
+            for (int i = 0, i_max = m_entityTerminateSystems.Length; i < i_max; i++)
             {
                 m_entityTerminateSystems[i].OnBeforeEntityDestroyed(this, entity);
             }
         }
 
-        public IContextBinding BindEvent<T>() where T : class, IEvent
+        public Context BindEvent<T>() where T : class, IEvent
         {
             return BindSystem<EventCollector<T>>();
         }
         
-        public IContextBinding BindPromise<T>() where T : class, IPromise
+        public Context BindPromise<T>() where T : class, IPromise
         {
             return BindSystem<PromiseCollector<T>>();
         }
         
-        public IContextBinding BindSystem<T>() where T : class, ISystem, new()
+        public Context BindSystem<T>() where T : class, ISystem, new()
         {
-            var bin_system = new T();
-        
-            m_allSystems.Add(bin_system);
-        
-            switch (bin_system)
-            {
-                case IFixedUpdateSystem fixed_update_system: 
-                    m_fixedUpdateSystems.Add(fixed_update_system);
-                    break;
-                case IUpdateSystem update_system: 
-                    m_updateSystems.Add(update_system);
-                    break;
-                case ILateUpdateSystem late_update_system: 
-                    m_lateUpdateSystems.Add(late_update_system);
-                    break;
-                case IEntityInitializeSystem enabled_system: 
-                    m_entityInitializeSystems.Add(enabled_system);
-                    break;
-                case IEntityTerminateSystem disabled_system: 
-                    m_entityTerminateSystems.Add(disabled_system);
-                    break;
-            }
-
+            m_allSystems.Add(new T());
             return this;
         }
 
-        public IContextBinding Inject<T>(T injection) where T : class
+        public Context Inject<T>(T injection) where T : class
         {
             if (m_injectionsCache.Contains(injection) == false)
             {
@@ -116,9 +94,21 @@ namespace UniversalEntities
             return this;
         }
 
-        public void Init()
+        internal void Init()
         {
+            CastSystems();
             InjectDependencies();
+        }
+
+        private void CastSystems()
+        {
+            var all_systems = m_allSystems.ToArray();
+            
+            ArrayTool.WhereCast(all_systems, out m_updateSystems);
+            ArrayTool.WhereCast(all_systems, out m_fixedUpdateSystems);
+            ArrayTool.WhereCast(all_systems, out m_lateUpdateSystems);
+            ArrayTool.WhereCast(all_systems, out m_entityInitializeSystems);
+            ArrayTool.WhereCast(all_systems, out m_entityTerminateSystems);
         }
 
         private void InjectDependencies()
@@ -172,7 +162,7 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void OnFixedUpdate()
         {
-            for (int i = 0, i_max = m_fixedUpdateSystems.Count; i < i_max; i++)
+            for (int i = 0, i_max = m_fixedUpdateSystems.Length; i < i_max; i++)
             {
                 m_fixedUpdateSystems[i].OnFixedUpdate(this);
             }
@@ -181,7 +171,7 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void OnUpdate()
         {
-            for (int i = 0, i_max = m_updateSystems.Count; i < i_max; i++)
+            for (int i = 0, i_max = m_updateSystems.Length; i < i_max; i++)
             {
                 m_updateSystems[i].OnUpdate(this);
             }
@@ -190,7 +180,7 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void OnLateUpdate()
         {
-            for (int i = 0, i_max = m_lateUpdateSystems.Count; i < i_max; i++)
+            for (int i = 0, i_max = m_lateUpdateSystems.Length; i < i_max; i++)
             {
                 m_lateUpdateSystems[i].OnLateUpdate(this);
             }

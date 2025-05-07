@@ -6,7 +6,7 @@ namespace UniversalEntities
         : Processor<T>
         , IUpdateSystem where T : class, IPromise
     {
-        protected override void OnExecute(IContext context, IEntity entity)
+        protected override void OnExecute(Context context, IEntity entity)
         {
             var promise = m_data1;
             
@@ -29,7 +29,7 @@ namespace UniversalEntities
                     var target = promise.Target;
                     for (int i = 0, i_max = resolve.Count; i < i_max; i++)
                     {
-                        target.Add(resolve[i]);
+                        target.AddComponent(resolve[i]);
                     }
                     break;
                 case EPromiseState.Rejected: 
@@ -45,7 +45,7 @@ namespace UniversalEntities
             promise.Target = null;
             promise.State = EPromiseState.Pending;
 
-            entity.Remove(promise);
+            entity.RemoveComponent(promise);
         }
     };
 }

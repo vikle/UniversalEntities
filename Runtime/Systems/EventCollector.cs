@@ -4,9 +4,9 @@
         : Processor<T>
         , IUpdateSystem where T : class, IEvent
     {
-        protected override void OnExecute(IContext context, IEntity entity)
+        protected override void OnExecute(Context context, IEntity entity)
         {
-            entity.Remove(m_data1);
+            entity.RemoveComponent(m_data1);
         }
     };
 }

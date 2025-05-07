@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 
 #if ENABLE_IL2CPP
-    using Unity.IL2CPP.CompilerServices;
+using Unity.IL2CPP.CompilerServices;
 #endif
 
 namespace UniversalEntities
@@ -23,7 +23,7 @@ namespace UniversalEntities
             m_entities = entities;
             m_count = m_entities.Count;
             m_index = -1;
-            Current = default;
+            Current = null;
         }
 
         public IEntity Current

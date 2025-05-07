@@ -16,25 +16,25 @@ namespace UniversalEntities
         protected T m_data1;
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public virtual void OnFixedUpdate(IContext context)
+        public virtual void OnFixedUpdate(Context context)
         {
             UpdateInternal(context);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public virtual void OnUpdate(IContext context)
+        public virtual void OnUpdate(Context context)
         {
             UpdateInternal(context);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public virtual void OnLateUpdate(IContext context)
+        public virtual void OnLateUpdate(Context context)
         {
             UpdateInternal(context);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void UpdateInternal(IContext context)
+        private void UpdateInternal(Context context)
         {
             foreach (var entity in context)
             {
@@ -48,11 +48,11 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected virtual bool TryGetFragment(IEntity entity)
         {
-            return entity.TryGet(out m_data1);
+            return entity.TryGetComponent(out m_data1);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract void OnExecute(IContext context, IEntity entity);
+        protected abstract void OnExecute(Context context, IEntity entity);
     };
     
         public abstract class Processor<T1, T2> : Processor<T1>
@@ -65,7 +65,7 @@ namespace UniversalEntities
         protected override bool TryGetFragment(IEntity entity)
         {
             return base.TryGetFragment(entity) 
-                && entity.TryGet(out m_data2);
+                && entity.TryGetComponent(out m_data2);
         }
     };
     
@@ -80,7 +80,7 @@ namespace UniversalEntities
         protected override bool TryGetFragment(IEntity entity)
         {
             return base.TryGetFragment(entity) 
-                && entity.TryGet(out m_data3);
+                && entity.TryGetComponent(out m_data3);
         }
     };
     
@@ -96,7 +96,7 @@ namespace UniversalEntities
         protected override bool TryGetFragment(IEntity entity)
         {
             return base.TryGetFragment(entity)
-                && entity.TryGet(out m_data4);
+                && entity.TryGetComponent(out m_data4);
         }
     };
     
@@ -113,7 +113,7 @@ namespace UniversalEntities
         protected override bool TryGetFragment(IEntity entity)
         {
             return base.TryGetFragment(entity) 
-                && entity.TryGet(out m_data5);
+                && entity.TryGetComponent(out m_data5);
         }
     };
     
@@ -131,7 +131,7 @@ namespace UniversalEntities
         protected override bool TryGetFragment(IEntity entity)
         {
             return base.TryGetFragment(entity) 
-                && entity.TryGet(out m_data6);
+                && entity.TryGetComponent(out m_data6);
         }
     };
     
@@ -150,7 +150,7 @@ namespace UniversalEntities
         protected override bool TryGetFragment(IEntity entity)
         {
             return base.TryGetFragment(entity) 
-                && entity.TryGet(out m_data7);
+                && entity.TryGetComponent(out m_data7);
         }
     };
     
@@ -170,7 +170,7 @@ namespace UniversalEntities
         protected override bool TryGetFragment(IEntity entity)
         {
             return base.TryGetFragment(entity) 
-                && entity.TryGet(out m_data8);
+                && entity.TryGetComponent(out m_data8);
         }
     };
 }

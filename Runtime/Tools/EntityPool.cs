@@ -1,6 +1,6 @@
 ﻿namespace UniversalEntities
 {
-    public sealed class EntityPool : ObjectPool<IEntity>
+    internal sealed class EntityPool : ObjectPool<IEntity>
     {
         public static T Get<T>() where T : class, IEntity, new()
         {

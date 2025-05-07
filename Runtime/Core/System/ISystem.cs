@@ -6,31 +6,31 @@
     
     public interface IStartSystem : ISystem
     {
-        void OnStart(IContext context);
+        void OnStart(Context context);
     };
     
     public interface IFixedUpdateSystem : ISystem
     {
-        void OnFixedUpdate(IContext context);
+        void OnFixedUpdate(Context context);
     };
     
     public interface IUpdateSystem : ISystem
     {
-        void OnUpdate(IContext context);
+        void OnUpdate(Context context);
     };
     
     public interface ILateUpdateSystem : ISystem
     {
-        void OnLateUpdate(IContext context);
+        void OnLateUpdate(Context context);
     };
     
     public interface IEntityInitializeSystem : ISystem
     {
-        void OnAfterEntityCreated(IContext context, IEntity entity);
+        void OnAfterEntityCreated(Context context, IEntity entity);
     };
     
     public interface IEntityTerminateSystem: ISystem
     {
-        void OnBeforeEntityDestroyed(IContext context, IEntity entity);
+        void OnBeforeEntityDestroyed(Context context, IEntity entity);
     };
 }
