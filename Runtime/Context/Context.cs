@@ -15,7 +15,7 @@ namespace UniversalEntities
 #endif
     public sealed class Context
     {
-        readonly List<IEntity> m_entities = new List<IEntity>(32);
+        readonly List<Entity> m_entities = new List<Entity>(32);
         readonly List<ISystem> m_allSystems = new List<ISystem>(128);
         
         IFixedUpdateSystem[] m_fixedUpdateSystems;
@@ -27,22 +27,22 @@ namespace UniversalEntities
         ArrayList m_injectionsCache = new ArrayList(16);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IEntity CreateEntity<T>() where T : class, IEntity, new()
+        public Entity CreateEntity()
         {
-            var entity = EntityPool.Get<T>();
+            var entity = EntityPool.Get();
             AddEntity(entity);
             return entity;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void DestroyEntity(IEntity entity)
+        public void DestroyEntity(Entity entity)
         {
             RemoveEntity(entity);
             entity.Dispose();
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddEntity(IEntity entity)
+        public void AddEntity(Entity entity)
         {
             if (m_entities.Contains(entity)) return;
 
@@ -55,7 +55,7 @@ namespace UniversalEntities
         }
     
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void RemoveEntity(IEntity entity)
+        public void RemoveEntity(Entity entity)
         {
             int entity_id = m_entities.IndexOf(entity);
             if (entity_id < 0) return;

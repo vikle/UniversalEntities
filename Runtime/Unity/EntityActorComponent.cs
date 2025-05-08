@@ -12,7 +12,7 @@ namespace UniversalEntities
     [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
     [RequireComponent(typeof(EntityActor))]
-    public abstract class EntityActorComponent : MonoBehaviour, IComponent
+    public abstract class EntityActorComponent : MonoBehaviour, IUnmanagedComponent
     {
         [SerializeField]
         EntityActor m_actor;

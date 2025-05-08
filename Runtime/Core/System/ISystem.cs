@@ -26,11 +26,11 @@
     
     public interface IEntityInitializeSystem : ISystem
     {
-        void OnAfterEntityCreated(Context context, IEntity entity);
+        void OnAfterEntityCreated(Context context, Entity entity);
     };
     
     public interface IEntityTerminateSystem: ISystem
     {
-        void OnBeforeEntityDestroyed(Context context, IEntity entity);
+        void OnBeforeEntityDestroyed(Context context, Entity entity);
     };
 }

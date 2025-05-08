@@ -37,7 +37,7 @@ namespace UniversalEntities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal bool Add<T>(T instance) where T : class, IFragment
+        internal bool Add<T>(T instance) where T : class, IUnmanagedComponent
         {
             ArrayTool.EnsureCapacity(ref m_sparse, FragmentIndexCounter.count);
 
@@ -74,46 +74,51 @@ namespace UniversalEntities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal bool Remove<T>(T instance) where T : class, IFragment
+        internal bool Remove<T>() where T : class, IFragment
         {
             int type_index = FragmentTypeIndex<T>.Index;
-
-            int[] sparse = m_sparse;
             
-            if (sparse.Length <= type_index) return false;
+            if (m_sparse.Length <= type_index) return false;
 
-            ref int pointer = ref sparse[type_index];
-
-            m_dense[pointer] = null;
+            ref int pointer = ref m_sparse[type_index];
             
-            pointer = 0;
+            if (pointer == 0) return false;
+
+            ClearDense(pointer);
+            
             m_denseCount--;
-            
+            pointer = 0;
+
             return true;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal bool Remove<T>() where T : class, IFragment
+        internal void Clear()
         {
-            int type_index = FragmentTypeIndex<T>.Index;
-
-            int[] sparse = m_sparse;
+            for (int i = 0, i_max = m_sparse.Length; i < i_max; i++)
+            {
+                m_sparse[i] = 0;
+            }
             
-            if (sparse.Length <= type_index) return false;
-
-            ref int pointer = ref sparse[type_index];
+            for (int i = 0; i < m_denseCount; i++)
+            {
+                ClearDense(i);
+            }
             
-            if (pointer == 0) return false;
+            m_denseCount = 0;
+        }
 
-            m_denseCount--;
-            
-            ref var value = ref m_dense[pointer];
-            FragmentPool.Release(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ClearDense(int index)
+        {
+            ref var value = ref m_dense[index];
+                
+            if (value is not IUnmanagedComponent)
+            {
+                FragmentPool.Release(value);
+            }
+                
             value = null;
-
-            pointer = 0;
-
-            return true;
         }
     };
 }

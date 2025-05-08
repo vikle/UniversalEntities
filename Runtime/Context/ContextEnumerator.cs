@@ -13,12 +13,12 @@ namespace UniversalEntities
 #endif
     public struct ContextEnumerator
     {
-        readonly IReadOnlyList<IEntity> m_entities;
+        readonly IReadOnlyList<Entity> m_entities;
         readonly int m_count;
         int m_index;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ContextEnumerator(IReadOnlyList<IEntity> entities)
+        public ContextEnumerator(IReadOnlyList<Entity> entities)
         {
             m_entities = entities;
             m_count = m_entities.Count;
@@ -26,7 +26,7 @@ namespace UniversalEntities
             Current = null;
         }
 
-        public IEntity Current
+        public Entity Current
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]get; 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]private set;

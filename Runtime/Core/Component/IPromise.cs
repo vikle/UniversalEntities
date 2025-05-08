@@ -13,6 +13,6 @@ namespace UniversalEntities
     {
         EPromiseState State { get; set; }
         List<IEvent> Resolve { get; }
-        IEntity Target { get; set; }
+        Entity Target { get; set; }
     };
 }

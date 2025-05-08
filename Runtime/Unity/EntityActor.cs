@@ -2,7 +2,7 @@
 using UnityEngine;
 
 #if ENABLE_IL2CPP
-    using Unity.IL2CPP.CompilerServices;
+using Unity.IL2CPP.CompilerServices;
 #endif
 
 namespace UniversalEntities
@@ -14,7 +14,7 @@ namespace UniversalEntities
     [DisallowMultipleComponent]
     public sealed class EntityActor : MonoBehaviour
     {
-        public IEntity Entity
+        public Entity EntityRef
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]get; 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]private set;
@@ -22,8 +22,11 @@ namespace UniversalEntities
         
         EntityActorComponent[] m_attachedComponents;
 
+        Context m_context;
+
         void Awake()
         {
+            m_context = UniversalEntitiesEngine.GetContext;
             InitAttachedComponents();
         }
 
@@ -39,11 +42,11 @@ namespace UniversalEntities
 
         public void InitEntity()
         {
-            if (Entity != null) return;
+            if (EntityRef != null) return;
             
             InitAttachedComponents();
             
-            var entity = UniversalEntitiesEngine.GetContext.CreateEntity<Entity>();
+            var entity = m_context.CreateEntity();
             
             for (int i = 0, i_max = m_attachedComponents.Length; i < i_max; i++)
             {
@@ -51,24 +54,24 @@ namespace UniversalEntities
                 entity.AddComponent(instance);
             }
 
-            Entity = entity;
+            EntityRef = entity;
         }
 
         public void DisposeEntity()
         {
-            var entity = Entity;
+            var entity = EntityRef;
             
             if (entity == null) return;
 
-            UniversalEntitiesEngine.GetContext.DestroyEntity(entity);
+            m_context.DestroyEntity(entity);
             
             for (int i = 0, i_max = m_attachedComponents.Length; i < i_max; i++)
             {
                 var instance = m_attachedComponents[i];
-                entity.RemoveComponent(instance);
+                // entity.RemoveComponent(instance);
             }
             
-            Entity = null;
+            EntityRef = null;
         }
 
         private void InitAttachedComponents()

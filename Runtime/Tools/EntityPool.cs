@@ -1,13 +1,13 @@
 ﻿namespace UniversalEntities
 {
-    internal sealed class EntityPool : ObjectPool<IEntity>
+    internal sealed class EntityPool : ObjectPool<Entity>
     {
-        public static T Get<T>() where T : class, IEntity, new()
+        public static Entity Get()
         {
-            return GetInternal<T>();
+            return GetInternal<Entity>();
         }
         
-        public static void Release<T>(T instance) where T : class, IEntity
+        public static void Release(Entity instance)
         {
             ReleaseInternal(instance);
         }

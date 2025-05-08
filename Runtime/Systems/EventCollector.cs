@@ -1,12 +1,10 @@
 ﻿namespace UniversalEntities
 {
-    public sealed class EventCollector<T> 
-        : Processor<T>
-        , IUpdateSystem where T : class, IEvent
+    public sealed class EventCollector<T> : IUpdateSystem where T : class, IEvent
     {
-        protected override void OnExecute(Context context, IEntity entity)
+        public void OnUpdate(Context context)
         {
-            entity.RemoveComponent(m_data1);
+            
         }
     };
 }
