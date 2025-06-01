@@ -22,11 +22,11 @@ namespace UniversalEntities
         
         EntityActorComponent[] m_attachedComponents;
 
-        Context m_context;
+        Pipeline m_pipeline;
 
         void Awake()
         {
-            m_context = UniversalEntitiesEngine.GetContext;
+            m_pipeline = Pipeline.Instance;
             InitAttachedComponents();
         }
 
@@ -46,7 +46,7 @@ namespace UniversalEntities
             
             InitAttachedComponents();
             
-            var entity = m_context.CreateEntity();
+            var entity = m_pipeline.CreateEntity();
             
             for (int i = 0, i_max = m_attachedComponents.Length; i < i_max; i++)
             {
@@ -63,7 +63,7 @@ namespace UniversalEntities
             
             if (entity == null) return;
 
-            m_context.DestroyEntity(entity);
+            m_pipeline.DestroyEntity(entity);
             
             for (int i = 0, i_max = m_attachedComponents.Length; i < i_max; i++)
             {

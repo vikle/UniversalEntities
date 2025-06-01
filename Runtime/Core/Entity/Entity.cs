@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 #if ENABLE_IL2CPP
-    using Unity.IL2CPP.CompilerServices;
+using Unity.IL2CPP.CompilerServices;
 #endif
 
 namespace UniversalEntities
@@ -14,9 +12,47 @@ namespace UniversalEntities
 #endif
     public sealed class Entity
     {
-        readonly Context m_context = UniversalEntitiesEngine.GetContext;
-        readonly FragmentStack m_fragmentStack = new FragmentStack();
+        readonly Pipeline m_pipeline;
+        readonly FragmentStack m_fragmentStack;
 
+        internal BitMask Mask;
+        internal int Index;
+        
+        public bool IsAlive
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]get; 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]private set;
+        }
+
+        public Entity()
+        {
+            m_pipeline = Pipeline.Instance;
+            m_fragmentStack = new FragmentStack();
+            Index = -1;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal void Init(int position)
+        {
+            IsAlive = true;
+            Index = position;
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal void Dispose()
+        {
+            IsAlive = false;
+            Mask = default;
+            Index = -1;
+            m_fragmentStack.Clear();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Destroy()
+        {
+            m_pipeline.DestroyEntity(this);
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool HasComponent<T>() where T : class, IFragment
         {
@@ -47,21 +83,27 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T AddComponent<T>() where T : class, IFragment, new()
         {
-            if (m_fragmentStack.Add<T>(out var instance))
+            if (!m_fragmentStack.Add<T>(out var instance))
             {
-                
+                return instance;
             }
             
+            int type_index = FragmentTypeIndex<T>.Index;
+            Mask.Set(type_index);
+
             return instance;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddComponent<T>(T instance) where T : class, IUnmanagedComponent
         {
-            if (m_fragmentStack.Add(instance))
+            if (!m_fragmentStack.Add(instance))
             {
-                
+                return;
             }
+            
+            int type_index = FragmentTypeIndex<T>.Index;
+            Mask.Set(type_index);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -73,17 +115,13 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void RemoveComponent<T>() where T : class, IFragment
         {
-            if (m_fragmentStack.Remove<T>())
+            if (!m_fragmentStack.Remove<T>())
             {
-                
+                return;
             }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Dispose()
-        {
-            EntityPool.Release(this);
-            m_fragmentStack.Clear();
+            
+            int type_index = FragmentTypeIndex<T>.Index;
+            Mask.Unset(type_index);
         }
     };
 }

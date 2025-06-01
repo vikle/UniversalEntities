@@ -39,7 +39,7 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal bool Add<T>(T instance) where T : class, IUnmanagedComponent
         {
-            ArrayTool.EnsureCapacity(ref m_sparse, FragmentIndexCounter.count);
+            ArrayTool.EnsureCapacity(ref m_sparse, FragmentIndexCounter.Count);
 
             int type_index = FragmentTypeIndex<T>.Index;
             ref int pointer = ref m_sparse[type_index];
@@ -55,7 +55,7 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal bool Add<T>(out T instance) where T : class, IFragment, new()
         {
-            ArrayTool.EnsureCapacity(ref m_sparse, FragmentIndexCounter.count);
+            ArrayTool.EnsureCapacity(ref m_sparse, FragmentIndexCounter.Count);
 
             int type_index = FragmentTypeIndex<T>.Index;
             ref int pointer = ref m_sparse[type_index];

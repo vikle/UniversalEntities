@@ -4,12 +4,12 @@ namespace UniversalEntities
 {
     public sealed class PromiseCollector<T> : IUpdateSystem where T : class, IPromise
     {
-        public void OnUpdate(Context context)
+        public void OnUpdate(Pipeline pipeline)
         {
             
         }
         
-        // protected void OnExecute(Context context, IEntity entity)
+        // protected void OnExecute(Pipeline pipeline, IEntity entity)
         // {
         //     var promise = new T();
         //     

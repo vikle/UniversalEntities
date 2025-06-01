@@ -12,6 +12,6 @@ namespace UniversalEntities
 #endif
     public abstract class UniversalEntitiesBootstrap : MonoBehaviour
     {
-        public abstract void OnBootstrap(Context context);
+        public abstract void OnBootstrap(Pipeline pipeline);
     };
 }

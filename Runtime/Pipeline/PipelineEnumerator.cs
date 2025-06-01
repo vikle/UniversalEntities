@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 #if ENABLE_IL2CPP
 using Unity.IL2CPP.CompilerServices;
@@ -11,17 +10,17 @@ namespace UniversalEntities
     [Il2CppSetOption(Option.NullChecks, false)]
     [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
-    public struct ContextEnumerator
+    public struct PipelineEnumerator
     {
-        readonly IReadOnlyList<Entity> m_entities;
-        readonly int m_count;
+        readonly Entity[] m_sparseEntities;
+        readonly int m_denseCount;
         int m_index;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ContextEnumerator(IReadOnlyList<Entity> entities)
+        public PipelineEnumerator(Entity[] sparseEntities, int denseCount)
         {
-            m_entities = entities;
-            m_count = m_entities.Count;
+            m_sparseEntities = sparseEntities;
+            m_denseCount = denseCount;
             m_index = -1;
             Current = null;
         }
@@ -35,13 +34,12 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool MoveNext()
         {
-            int count = m_count;
+            int count = m_denseCount;
             ref int index = ref m_index;
-            var entities = m_entities;
             
             if (++index >= count) return false;
 
-            Current = entities[index];
+            Current = m_sparseEntities[index];
             return true;
         }
     };

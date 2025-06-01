@@ -2,12 +2,12 @@
 {
     internal sealed class EntityPool : ObjectPool<Entity>
     {
-        public static Entity Get()
+        internal static Entity Get()
         {
             return GetInternal<Entity>();
         }
         
-        public static void Release(Entity instance)
+        internal static void Release(Entity instance)
         {
             ReleaseInternal(instance);
         }

@@ -17,51 +17,52 @@ namespace UniversalEntities
     {
         public UniversalEntitiesBootstrap bootstrap;
 
-        static Context s_context;
+        Pipeline m_pipeline;
         
-        public static Context GetContext
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get
-            {
-                if (s_context != null) return s_context;
-                s_context = new Context();
-                return s_context;
-            }
-        }
+        static UniversalEntitiesEngine s_validInstance;
         
         void Awake()
         {
-            var context = GetContext;
+            if (s_validInstance != null && s_validInstance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            
+            s_validInstance = this;
+            
+            DontDestroyOnLoad(gameObject);
+            
+            m_pipeline = Pipeline.Instance;
             
             if (bootstrap != null)
             {
-                bootstrap.OnBootstrap(context);
+                bootstrap.OnBootstrap(m_pipeline);
             }
             
-            context.Init();
+            m_pipeline.Init();
         }
 
         void Start()
         {
-            s_context.OnStart();
+            m_pipeline.OnStart();
         }
 
         void FixedUpdate()
         {
             TimeData.OnFixedUpdate();
-            s_context.OnFixedUpdate();
+            m_pipeline.OnFixedUpdate();
         }
 
         void Update()
         {
             TimeData.OnUpdate();
-            s_context.OnUpdate();
+            m_pipeline.OnUpdate();
         }
 
         void LateUpdate()
         {
-            s_context.OnLateUpdate();
+            m_pipeline.OnLateUpdate();
         }
         
 #if UNITY_EDITOR
