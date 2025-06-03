@@ -31,10 +31,13 @@ namespace UniversalEntities
         internal static void EnsureCapacity<T>(ref T[] array, int minCapacity)
         {
             int current_capacity = array.Length;
+
+            if (current_capacity > minCapacity) return;
             
-            if (current_capacity <= minCapacity)
+            while (current_capacity <= minCapacity)
             {
-                Array.Resize(ref array, (current_capacity << 1));
+                current_capacity = (current_capacity << 1);
+                Array.Resize(ref array, current_capacity);
             }
         }
         

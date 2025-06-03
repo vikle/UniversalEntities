@@ -41,28 +41,29 @@ namespace UniversalEntities
             }
             
             m_pipeline.Init();
+            m_pipeline.RunAwake();
         }
 
         void Start()
         {
-            m_pipeline.OnStart();
+            m_pipeline.RunStart();
         }
 
         void FixedUpdate()
         {
             TimeData.OnFixedUpdate();
-            m_pipeline.OnFixedUpdate();
+            m_pipeline.RunFixedUpdate();
         }
 
         void Update()
         {
             TimeData.OnUpdate();
-            m_pipeline.OnUpdate();
+            m_pipeline.RunUpdate();
         }
 
         void LateUpdate()
         {
-            m_pipeline.OnLateUpdate();
+            m_pipeline.RunLateUpdate();
         }
         
 #if UNITY_EDITOR

@@ -19,10 +19,8 @@ namespace UniversalEntities
 
         static Pipeline() { Instance = new Pipeline(); }
         
-        bool[] m_sparseEntities;
-        
-        Entity[] m_denseEntities;
-        int m_denseCount;
+        internal Entity[] m_sparseEntities;
+        readonly AllocableSparseSet m_sparseSet;
         
         readonly List<ISystem> m_allSystems;
         
@@ -36,16 +34,16 @@ namespace UniversalEntities
 
         internal Pipeline()
         {
-            m_sparseEntities = new bool[128];
-            m_denseEntities = new Entity[32];
+            m_sparseEntities = new Entity[64];
             m_allSystems = new List<ISystem>(128);
-            m_injectionsCache = new ArrayList(16);
+            m_injectionsCache = new ArrayList(32);
+            m_sparseSet = new AllocableSparseSet();
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public PipelineEnumerator GetEnumerator()
+        public SparseEntitiesEnumerator GetEnumerator()
         {
-            return new PipelineEnumerator(m_denseEntities, m_denseCount);
+            return new SparseEntitiesEnumerator(m_sparseEntities, m_sparseSet.m_dense, m_sparseSet.m_count);
         }
     };
 }

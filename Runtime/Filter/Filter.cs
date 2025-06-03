@@ -13,44 +13,40 @@ namespace UniversalEntities
     public sealed class Filter
     {
         readonly BitMask m_mask;
+        readonly SparseSet m_sparseSet;
+
+        readonly Pipeline m_pipeline;
         
-        Entity[] m_sparse;
-        Entity[] m_dense;
-        int m_denseCount;
+        Entity[] m_entities;
+        int[] m_dense; 
+        int m_count;
         
         int m_iterator;
         bool m_locked;
         int m_waitersCount;
-        (bool, Entity)[] m_waiters;
+        (bool, int)[] m_waiters;
         
         public int EntityCount
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => m_denseCount;
+            get => m_sparseSet.m_count;
         }
         
         public bool IsEmpty
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => (m_denseCount == 0);
-        }
-        
-        public Entity FirstEntity
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => m_dense[0];
+            get => (m_sparseSet.m_count == 0);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal Filter(int capacity)
+        internal Filter(Pipeline pipeline)
         {
-            m_dense = new Entity[16];
-            m_sparse = new Entity[capacity];
-            m_waiters = new (bool, Entity)[2];
+            m_sparseSet = new SparseSet();
+            m_waiters = new (bool, int)[8];
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal Filter(int capacity, in BitMask mask) : this(capacity)
+        internal Filter(Pipeline pipeline, in BitMask mask) : this(pipeline)
         {
             m_mask = mask;
         }
@@ -72,28 +68,57 @@ namespace UniversalEntities
 #endif
             m_locked = true;
             m_iterator = -1;
+            m_count = m_sparseSet.m_count;
+            m_entities = m_pipeline.m_sparseEntities;
         }
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryIterate(out Entity entity)
         {
             ref int iterator = ref m_iterator;
-
-            if (++iterator >= m_denseCount)
+        
+            if (++iterator >= m_count)
             {
-                // End();
+                End();
                 entity = null;
                 return false;
             }
-
-            entity = m_dense[iterator];
+        
+            entity = m_entities[m_dense[iterator]];
             return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void End()
+        {
+#if DEBUG
+            if (!m_locked)
+            {
+                throw new System.Exception("Try end unlocked filter.");
+            }
+#endif
+            m_locked = false;
+
+            if (m_waitersCount == 0) return;
+            
+            var waiters = m_waiters;
+            var sparse_set = m_sparseSet;
+            
+            for (int i = 0, i_max = m_waitersCount; i < i_max; i++)
+            {
+                (bool action, int entity) = waiters[i];
+                
+                if (action) sparse_set.Add(entity);
+                else sparse_set.Remove(entity);
+            }
+
+            m_waitersCount = 0;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void EnsureCapacity(int capacity)
         {
-            ArrayTool.EnsureCapacity(ref m_sparse, capacity);
+            m_sparseSet.EnsureSparseCapacity(capacity);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -101,95 +126,35 @@ namespace UniversalEntities
         {
             if (m_locked)
             {
-                ArrayTool.Push(ref m_waiters, ref m_waitersCount, (true, entity));
+                ArrayTool.Push(ref m_waiters, ref m_waitersCount, (true, entity.Id));
                 return;
             }
 
-            AddEntityInternal(entity);
+            m_sparseSet.Remove(entity.Id);
         }
         
-        // ReSharper disable Unity.PerformanceAnalysis
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void AddEntityInternal(Entity entity)
+        internal void RemoveEntity(Entity entity)
         {
-            ref var pointer = ref m_sparse[entity.Index];
-
-            if (pointer != null) return;
-
-            ArrayTool.Push(ref m_dense, ref m_denseCount, in entity);
-            pointer = entity;
-        }
-        
-        
-        // ReSharper disable Unity.PerformanceAnalysis
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void RemoveEntityInternal000(Entity entity)
-        {
-            var sparse = m_sparse;
-            ref var pointer = ref sparse[entity.Index];
-
-            if (pointer == null) return;
-            
-            int index = (pointer.Index - 1);
-            pointer = null;
-            
-            int last_index = --m_denseCount;
-
-            if (index >= last_index) return;
-
-            var dense = m_dense;
-            ref var current = ref dense[index];
-            current = dense[last_index];
-            sparse[current.Index] = current;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void RemoveEntityInternal(Entity entity)
-        {
-            var sparse = m_sparse;
-            int sparse_pos = entity.Index;
-
-            if (sparse[sparse_pos] != entity) return;
-
-            sparse[sparse_pos] = null;
-
-            var dense = m_dense;
-            
-            int index = -1;
-            
-            for (int i = 0, i_max = m_denseCount; i < i_max; i++)
+            if (m_locked)
             {
-                if (dense[i] != entity) continue;
-                index = i;
-                break;
+                ArrayTool.Push(ref m_waiters, ref m_waitersCount, (false, entity.Id));
+                return;
             }
 
-            if (index == -1) return;
-
-            int last_index = --m_denseCount;
-
-            if (index == last_index) return;
-            
-            var last = dense[last_index];
-            dense[index] = last;
-
-            sparse[last.Index] = last;
+            m_sparseSet.Remove(entity.Id);
         }
-
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(Entity entity)
         {
-            return (m_sparse[entity.Index] != null);
+            return m_sparseSet.Contains(entity.Id);
         }
         
-        
-        
-        
-        
-        
-        
-        
-        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public FilterEnumerator GetEnumerator()
+        {
+            return new FilterEnumerator(this);
+        }
     };
 }

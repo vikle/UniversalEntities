@@ -11,39 +11,32 @@ namespace UniversalEntities
     [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
     public sealed class Entity
-    {
-        readonly Pipeline m_pipeline;
-        readonly FragmentStack m_fragmentStack;
+    { 
+        Pipeline m_pipeline;
+        readonly FragmentStack m_fragmentStack = new FragmentStack();
 
+        internal int Id;
         internal BitMask Mask;
-        internal int Index;
-        
+
         public bool IsAlive
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]get; 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]private set;
         }
 
-        public Entity()
-        {
-            m_pipeline = Pipeline.Instance;
-            m_fragmentStack = new FragmentStack();
-            Index = -1;
-        }
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void Init(int position)
+        internal void Init(Pipeline pipeline, int id)
         {
+            Id = id;
             IsAlive = true;
-            Index = position;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void Dispose()
         {
-            IsAlive = false;
             Mask = default;
-            Index = -1;
+            IsAlive = false;
+            m_pipeline = null;
             m_fragmentStack.Clear();
         }
 

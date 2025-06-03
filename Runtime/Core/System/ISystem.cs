@@ -4,6 +4,11 @@
     {
     };
     
+    public interface IAwakeSystem : ISystem
+    {
+        void OnAwake(Pipeline pipeline);
+    };
+    
     public interface IStartSystem : ISystem
     {
         void OnStart(Pipeline pipeline);

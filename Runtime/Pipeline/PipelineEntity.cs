@@ -7,8 +7,15 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Entity CreateEntity()
         {
+            int entity_id = m_sparseSet.Alloc();
+            
             var entity = EntityPool.Get();
-            AddEntity(entity);
+            
+            entity.Init(this, entity_id);
+            
+            ArrayTool.EnsureCapacity(ref m_sparseEntities, entity_id);
+            m_sparseEntities[entity_id] = entity;
+            
             return entity;
         }
 
@@ -17,46 +24,22 @@ namespace UniversalEntities
         {
             if (!entity.IsAlive) return;
             
+            RunBeforeEntityDestroyed(entity);
+            
             RemoveEntity(entity);
+            
+            RemoveEntityFromAllFilters(entity);
             
             entity.Dispose();
             EntityPool.Release(entity);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void AddEntity(Entity entity)
-        {
-            entity.Init(m_denseCount);
-            
-            for (int i = 0, i_max = m_entityInitializeSystems.Length; i < i_max; i++)
-            {
-                m_entityInitializeSystems[i].OnAfterEntityCreated(this, entity);
-            }
-            
-            ArrayTool.Push(ref m_denseEntities, ref m_denseCount, entity);
-        }
-    
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void RemoveEntity(Entity entity)
         {
-            int entity_index = entity.Index;
-            int last_index = --m_denseCount;
-            
-            var entities = m_denseEntities;
-
-            if (entity_index < last_index)
-            {
-                var last_entity = entities[last_index];
-                entities[entity_index] = last_entity;
-                last_entity.Index = entity_index;
-            }
-            
-            entities[last_index] = null;
-            
-            for (int i = 0, i_max = m_entityTerminateSystems.Length; i < i_max; i++)
-            {
-                m_entityTerminateSystems[i].OnBeforeEntityDestroyed(this, entity);
-            }
+            int entity_id = entity.Id;
+            m_sparseEntities[entity_id] = null;
+            m_sparseSet.Free(entity_id);
         }
     };
 }
