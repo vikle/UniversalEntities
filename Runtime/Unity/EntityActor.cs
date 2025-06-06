@@ -12,7 +12,7 @@ namespace UniversalEntities
     [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
     [DisallowMultipleComponent]
-    public sealed class EntityActor : MonoBehaviour
+    public abstract class EntityActor : MonoBehaviour
     {
         public Entity EntityRef
         {
@@ -47,6 +47,10 @@ namespace UniversalEntities
             InitAttachedComponents();
             
             var entity = m_pipeline.CreateEntity();
+
+            entity.AddComponent<ObjectRef<GameObject>>().Target = gameObject;
+            entity.AddComponent<ObjectRef<Transform>>().Target = transform;
+            entity.AddComponent<ObjectRef<EntityActor>>().Target = this;
             
             for (int i = 0, i_max = m_attachedComponents.Length; i < i_max; i++)
             {

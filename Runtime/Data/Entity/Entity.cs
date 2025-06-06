@@ -51,21 +51,7 @@ namespace UniversalEntities
         {
             return m_fragmentStack.Has<T>();
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T Trigger<T>() where T : class, IEvent, new()
-        {
-            return AddComponent<T>();
-        }
         
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T Then<T>() where T : class, IPromise, new()
-        {
-            var promise = AddComponent<T>();
-            promise.Target = this;
-            return promise;
-        }
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Mark<T>(EPromiseState newState) where T : class, IPromise
         {

@@ -36,6 +36,12 @@ namespace UniversalEntities
         
         ArrayList m_injectionsCache;
 
+        public int EntityCount
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => m_sparseSet.m_count;
+        }
+        
         public bool AutoUpdateFilters
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]get;

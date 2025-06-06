@@ -1,7 +1,15 @@
 using System.Runtime.CompilerServices;
 
+#if ENABLE_IL2CPP
+using Unity.IL2CPP.CompilerServices;
+#endif
+
 namespace UniversalEntities
 {
+#if ENABLE_IL2CPP
+    [Il2CppSetOption(Option.NullChecks, false)]
+    [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+#endif
     internal sealed class FragmentStack
     {
         int[] m_sparse = new int[16];
@@ -12,19 +20,20 @@ namespace UniversalEntities
         internal T Get<T>() where T : class, IFragment
         {
             int type_index = FragmentTypeIndex<T>.Index;
-
+#if DEBUG
             if (m_sparse.Length <= type_index)
             {
                 throw new System.InvalidOperationException($"Fragment type '{typeof(T)}' is not valid or not registered.");
             }
-            
+#endif
             ref int pointer = ref m_sparse[type_index];
 
+#if DEBUG
             if (pointer == 0)
             {
                 throw new System.InvalidOperationException($"Component of type '{typeof(T)}' not found on entity.");
             }
-            
+#endif
             return (T)m_dense[pointer];
         }
         
@@ -113,7 +122,7 @@ namespace UniversalEntities
         {
             ref var value = ref m_dense[index];
                 
-            if (value is not IUnmanagedComponent)
+            if (!(value is IUnmanagedComponent))
             {
                 FragmentPool.Release(value);
             }

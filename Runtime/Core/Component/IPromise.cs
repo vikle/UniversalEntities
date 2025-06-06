@@ -12,7 +12,5 @@ namespace UniversalEntities
     public interface IPromise : IFragment
     {
         EPromiseState State { get; set; }
-        List<IEvent> Resolve { get; }
-        Entity Target { get; set; }
     };
 }
