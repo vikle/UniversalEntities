@@ -83,6 +83,8 @@ namespace UniversalEntities
             
             int type_index = FragmentTypeIndex<T>.Index;
             Mask.Set(type_index);
+            
+            m_pipeline.OnEntityFragmentAdded(this);
 
             return instance;
         }
@@ -97,6 +99,8 @@ namespace UniversalEntities
             
             int type_index = FragmentTypeIndex<T>.Index;
             Mask.Set(type_index);
+            
+            m_pipeline.OnEntityFragmentAdded(this);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -115,6 +119,8 @@ namespace UniversalEntities
             
             int type_index = FragmentTypeIndex<T>.Index;
             Mask.Unset(type_index);
+            
+            m_pipeline.OnEntityFragmentRemoved(this);
         }
     };
 }

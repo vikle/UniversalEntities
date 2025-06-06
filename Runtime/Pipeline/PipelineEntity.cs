@@ -38,8 +38,8 @@ namespace UniversalEntities
         private void RemoveEntity(Entity entity)
         {
             int entity_id = entity.Id;
-            m_sparseEntities[entity_id] = null;
             m_sparseSet.Free(entity_id);
+            m_sparseEntities[entity_id] = null;
         }
     };
 }

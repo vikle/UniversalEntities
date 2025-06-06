@@ -22,6 +22,10 @@ namespace UniversalEntities
         internal Entity[] m_sparseEntities;
         readonly AllocableSparseSet m_sparseSet;
         
+        readonly Dictionary<BitMask, Filter> m_filtersMap;
+        Filter[] m_filtersBuffer;
+        int m_filtersCount;
+        
         readonly List<ISystem> m_allSystems;
         
         IFixedUpdateSystem[] m_fixedUpdateSystems;
@@ -32,12 +36,21 @@ namespace UniversalEntities
         
         ArrayList m_injectionsCache;
 
-        internal Pipeline()
+        public bool AutoUpdateFilters
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]set;
+        }
+        
+        public Pipeline()
         {
             m_sparseEntities = new Entity[64];
             m_allSystems = new List<ISystem>(128);
             m_injectionsCache = new ArrayList(32);
             m_sparseSet = new AllocableSparseSet();
+            
+            m_filtersMap = new Dictionary<BitMask, Filter>(64);
+            m_filtersBuffer = new Filter[64];
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
