@@ -12,9 +12,11 @@ namespace UniversalEntities
 #endif
     internal sealed class FragmentStack
     {
-        int[] m_sparse = new int[16];
-        IFragment[] m_dense = new IFragment[2];
-        int m_denseCount = 1;
+        int[] m_sparse = new int[32];
+        IFragment[] m_dense = new IFragment[8];
+        int m_denseCapacity = 1;
+        int[] m_recycled;
+        int m_recycledCount;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal T Get<T>() where T : class, IFragment
@@ -27,7 +29,6 @@ namespace UniversalEntities
             }
 #endif
             ref int pointer = ref m_sparse[type_index];
-
 #if DEBUG
             if (pointer == 0)
             {
@@ -41,8 +42,7 @@ namespace UniversalEntities
         internal bool Has<T>() where T : class, IFragment
         {
             int type_index = FragmentTypeIndex<T>.Index;
-            if (m_sparse.Length <= type_index) return false;
-            return (m_sparse[type_index] > 0);
+            return ((m_sparse.Length > type_index) && (m_sparse[type_index] > 0));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -55,9 +55,9 @@ namespace UniversalEntities
             
             if (pointer > 0) return false;
             
-            pointer = m_denseCount;
-            ArrayTool.Push(ref m_dense, ref m_denseCount, instance);
-            
+            pointer = RestoreDenseIndex();
+            m_dense[pointer] = instance;
+
             return true;
         }
 
@@ -75,11 +75,25 @@ namespace UniversalEntities
                 return false;
             }
 
-            pointer = m_denseCount;
             instance = FragmentPool.Get<T>();
-            ArrayTool.Push(ref m_dense, ref m_denseCount, instance);
-            
+            pointer = RestoreDenseIndex();
+            m_dense[pointer] = instance;
+
             return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private int RestoreDenseIndex()
+        {
+            if (ArrayTool.TryPop(m_recycled, ref m_recycledCount, out int index))
+            {
+                return index;
+            }
+            
+            index = m_denseCapacity;
+            ArrayTool.EnsureCapacity(ref m_dense, m_denseCapacity++);
+
+            return index;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -93,9 +107,8 @@ namespace UniversalEntities
             
             if (pointer == 0) return false;
 
-            ClearDense(pointer);
-            
-            m_denseCount--;
+            ClearDenseValue(pointer);
+            ArrayTool.Push(ref m_recycled, ref m_recycledCount, in pointer);
             pointer = 0;
 
             return true;
@@ -104,21 +117,21 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void Clear()
         {
-            for (int i = 0, i_max = m_sparse.Length; i < i_max; i++)
-            {
-                m_sparse[i] = 0;
-            }
+            int[] sparse = m_sparse;
             
-            for (int i = 0; i < m_denseCount; i++)
+            for (int i = 0, i_max = sparse.Length; i < i_max; i++)
             {
-                ClearDense(i);
+                ref int pointer = ref sparse[i];
+                if (pointer == 0) continue;
+                
+                ClearDenseValue(pointer);
+                ArrayTool.Push(ref m_recycled, ref m_recycledCount, in pointer);
+                pointer = 0;
             }
-            
-            m_denseCount = 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ClearDense(int index)
+        private void ClearDenseValue(int index)
         {
             ref var value = ref m_dense[index];
                 

@@ -41,7 +41,7 @@ namespace UniversalEntities
 
             if (pointer > 0) return;
             
-            ArrayTool.Push(ref m_dense,ref m_count, value);
+            ArrayTool.Push(ref m_dense, ref m_count, value);
             
             pointer = m_count;
         }
