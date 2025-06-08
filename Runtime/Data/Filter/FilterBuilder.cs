@@ -23,7 +23,7 @@ namespace UniversalEntities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public FilterBuilder With<T>() where T : struct, IFragment
+        public FilterBuilder With<T>() where T : class, IFragment
         {
             int type_index = FragmentTypeIndex<T>.Index;
             m_mask.Set(type_index);
@@ -47,7 +47,7 @@ namespace UniversalEntities
             {
                 if (entity.Mask.Has(in mask))
                 {
-                    filter.AddEntity(entity);
+                    filter.AddEntity(entity.Id);
                 }
             }
             

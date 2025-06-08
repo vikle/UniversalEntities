@@ -122,33 +122,33 @@ namespace UniversalEntities
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void AddEntity(Entity entity)
+        internal void AddEntity(int entityId)
         {
             if (m_locked)
             {
-                ArrayTool.Push(ref m_waiters, ref m_waitersCount, (true, entity.Id));
+                ArrayTool.Push(ref m_waiters, ref m_waitersCount, (true, entityId));
                 return;
             }
 
-            m_sparseSet.Remove(entity.Id);
+            m_sparseSet.Add(entityId);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void RemoveEntity(Entity entity)
+        internal void RemoveEntity(int entityId)
         {
             if (m_locked)
             {
-                ArrayTool.Push(ref m_waiters, ref m_waitersCount, (false, entity.Id));
+                ArrayTool.Push(ref m_waiters, ref m_waitersCount, (false, entityId));
                 return;
             }
 
-            m_sparseSet.Remove(entity.Id);
+            m_sparseSet.Remove(entityId);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Contains(Entity entity)
+        public bool Contains(int entityId)
         {
-            return m_sparseSet.Contains(entity.Id);
+            return m_sparseSet.Contains(entityId);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

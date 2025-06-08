@@ -15,6 +15,17 @@ namespace UniversalEntities
     [DefaultExecutionOrder(-100), DisallowMultipleComponent]
     public sealed class UniversalEntitiesEngine : MonoBehaviour
     {
+        static Pipeline s_pipelineInstance;
+
+        public static Pipeline PipelineInstance
+        {
+            get
+            {
+                if (s_pipelineInstance == null) s_pipelineInstance = new Pipeline();
+                return s_pipelineInstance;
+            }
+        }
+        
         public UniversalEntitiesBootstrap bootstrap;
 
         Pipeline m_pipeline;
@@ -23,17 +34,17 @@ namespace UniversalEntities
         
         void Awake()
         {
-            if (s_validInstance != null && s_validInstance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
+            // if (s_validInstance != null && s_validInstance != this)
+            // {
+            //     Destroy(gameObject);
+            //     return;
+            // }
+            //
+            // s_validInstance = this;
             
-            s_validInstance = this;
+            // DontDestroyOnLoad(gameObject);
             
-            DontDestroyOnLoad(gameObject);
-            
-            m_pipeline = Pipeline.Instance;
+            m_pipeline = PipelineInstance;
             
             if (bootstrap != null)
             {
@@ -65,7 +76,15 @@ namespace UniversalEntities
         {
             m_pipeline.RunLateUpdate();
         }
-        
+
+        void OnDestroy()
+        {
+            // if (s_validInstance != null && s_validInstance != this)
+            {
+                s_pipelineInstance = null;
+            }
+        }
+
 #if UNITY_EDITOR
         [UnityEditor.MenuItem("Tools/Universal Entities/Create/Engine", true)]
         private static bool CanCreateEngine()

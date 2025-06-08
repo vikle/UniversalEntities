@@ -63,6 +63,7 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void UpdateFilters(Entity entity)
         {
+            int entity_id = entity.Id;
             ref readonly var entity_mask = ref entity.Mask;
             var filters_buffer = m_filtersBuffer;
 
@@ -72,23 +73,23 @@ namespace UniversalEntities
 
                 if (filter.IsCompatibleWith(entity_mask))
                 {
-                    filter.AddEntity(entity);
+                    filter.AddEntity(entity_id);
                 }
-                else if (filter.Contains(entity))
+                else if (filter.Contains(entity_id))
                 {
-                    filter.RemoveEntity(entity);
+                    filter.RemoveEntity(entity_id);
                 }
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void RemoveEntityFromAllFilters(Entity entity)
+        private void RemoveEntityFromAllFilters(int entityId)
         {
             var filters = m_filtersBuffer;
             
             for (int i = 0, i_max = m_filtersCount; i < i_max; i++)
             {
-                filters[i].RemoveEntity(entity);
+                filters[i].RemoveEntity(entityId);
             }
         }
     };

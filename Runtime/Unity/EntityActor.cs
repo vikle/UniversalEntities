@@ -26,7 +26,7 @@ namespace UniversalEntities
 
         void Awake()
         {
-            m_pipeline = Pipeline.Instance;
+            m_pipeline = UniversalEntitiesEngine.PipelineInstance;
             InitAttachedComponents();
         }
 

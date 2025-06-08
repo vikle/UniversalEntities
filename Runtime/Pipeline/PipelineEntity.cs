@@ -15,31 +15,34 @@ namespace UniversalEntities
             
             ArrayTool.EnsureCapacity(ref m_sparseEntities, entity_id);
             m_sparseEntities[entity_id] = entity;
+
+            EnsureFiltersCapacity(entity_id);
             
             return entity;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void DestroyEntity(Entity entity)
+        internal void DestroyEntity(Entity entity)
         {
             if (!entity.IsAlive) return;
             
+            int entity_id = entity.Id;
+            
+            RemoveEntityFromAllFilters(entity_id);
+            
             RunBeforeEntityDestroyed(entity);
             
-            RemoveEntity(entity);
-            
-            RemoveEntityFromAllFilters(entity);
+            RemoveEntity(entity_id);
             
             entity.Dispose();
             EntityPool.Release(entity);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void RemoveEntity(Entity entity)
+        private void RemoveEntity(int entityId)
         {
-            int entity_id = entity.Id;
-            m_sparseSet.Free(entity_id);
-            m_sparseEntities[entity_id] = null;
+            m_sparseSet.Free(entityId);
+            m_sparseEntities[entityId] = null;
         }
     };
 }

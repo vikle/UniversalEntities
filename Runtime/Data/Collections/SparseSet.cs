@@ -91,7 +91,7 @@ namespace UniversalEntities
             {
                 index = m_count;
                 
-                EnsureSparseCapacity(index);
+                EnsureSparseCapacity(index + 1);
                 EnsureDenseCapacity(m_count + 1);
             }
             

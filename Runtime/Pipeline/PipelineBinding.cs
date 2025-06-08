@@ -1,3 +1,5 @@
+using System;
+
 namespace UniversalEntities
 {
     partial class Pipeline
@@ -12,9 +14,21 @@ namespace UniversalEntities
             return BindSystem<PromiseCollector<T>>();
         }
         
-        public Pipeline BindSystem<T>() where T : class, ISystem, new()
+        public Pipeline BindSystem<T>() where T : class, ISystem
         {
-            m_allSystems.Add(new T());
+            var system_type = typeof(T);
+
+#if (UNITY_2020_3_OR_NEWER && DEBUG)
+            var all_constructors = system_type.GetConstructors();
+            var main_constructor = all_constructors[0];
+
+            if (!Attribute.IsDefined(main_constructor, typeof(UnityEngine.Scripting.PreserveAttribute)))
+            {
+                throw new Exception($"Not found 'UnityEngine.Scripting.PreserveAttribute' on Constructor in '{system_type.Name}'.");
+            }
+#endif
+            object system = Activator.CreateInstance(system_type, m_systemParams);
+            m_allSystems.Add((ISystem)system);
             return this;
         }
 

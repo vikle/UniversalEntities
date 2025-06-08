@@ -29,6 +29,7 @@ namespace UniversalEntities
         {
             Id = id;
             IsAlive = true;
+            m_pipeline = pipeline;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

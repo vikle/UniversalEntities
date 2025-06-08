@@ -9,16 +9,11 @@ using Unity.IL2CPP.CompilerServices;
 namespace UniversalEntities
 {
 #if ENABLE_IL2CPP
-    [Il2CppEagerStaticClassConstruction]
     [Il2CppSetOption(Option.NullChecks, false)]
     [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
     public sealed partial class Pipeline
     {
-        public static Pipeline Instance { get; }
-
-        static Pipeline() { Instance = new Pipeline(); }
-        
         internal Entity[] m_sparseEntities;
         readonly AllocableSparseSet m_sparseSet;
         
@@ -35,6 +30,8 @@ namespace UniversalEntities
         IEntityTerminateSystem[] m_entityTerminateSystems;
         
         ArrayList m_injectionsCache;
+        
+        readonly object[] m_systemParams;
 
         public int EntityCount
         {
@@ -57,6 +54,10 @@ namespace UniversalEntities
             
             m_filtersMap = new Dictionary<BitMask, Filter>(64);
             m_filtersBuffer = new Filter[64];
+            
+            m_systemParams = new object[]{this};
+
+            AutoUpdateFilters = true;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

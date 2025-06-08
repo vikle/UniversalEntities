@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 #if ENABLE_IL2CPP
-    using Unity.IL2CPP.CompilerServices;
+using Unity.IL2CPP.CompilerServices;
 #endif
 
 namespace UniversalEntities
@@ -40,7 +40,7 @@ namespace UniversalEntities
         {
             var pool_type = instance.GetType();
 
-            if (sr_pool.TryGetValue(pool_type, out var stack) == false)
+            if (!sr_pool.TryGetValue(pool_type, out var stack))
             {
                 stack = new Stack<TType>();
                 sr_pool[pool_type] = stack;

@@ -15,7 +15,7 @@ namespace UniversalEntities
         int[] m_sparse = new int[32];
         IFragment[] m_dense = new IFragment[8];
         int m_denseCapacity = 1;
-        int[] m_recycled;
+        int[] m_recycled = new int[8];
         int m_recycledCount;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -48,9 +48,10 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal bool Add<T>(T instance) where T : class, IUnmanagedComponent
         {
-            ArrayTool.EnsureCapacity(ref m_sparse, FragmentIndexCounter.Count);
-
             int type_index = FragmentTypeIndex<T>.Index;
+            
+            ArrayTool.EnsureCapacity(ref m_sparse, FragmentIndexCounter.Count);
+            
             ref int pointer = ref m_sparse[type_index];
             
             if (pointer > 0) return false;
@@ -64,9 +65,10 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal bool Add<T>(out T instance) where T : class, IFragment, new()
         {
+            int type_index = FragmentTypeIndex<T>.Index;
+            
             ArrayTool.EnsureCapacity(ref m_sparse, FragmentIndexCounter.Count);
 
-            int type_index = FragmentTypeIndex<T>.Index;
             ref int pointer = ref m_sparse[type_index];
 
             if (pointer > 0)
