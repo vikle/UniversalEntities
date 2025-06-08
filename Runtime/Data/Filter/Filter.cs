@@ -17,10 +17,6 @@ namespace UniversalEntities
 
         readonly Pipeline m_pipeline;
         
-        Entity[] m_entities;
-        int[] m_dense; 
-        int m_count;
-        
         int m_iterator;
         bool m_locked;
         int m_waitersCount;
@@ -37,17 +33,13 @@ namespace UniversalEntities
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => (m_sparseSet.m_count == 0);
         }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal Filter(Pipeline pipeline)
-        {
-            m_sparseSet = new SparseSet();
-            m_waiters = new (bool, int)[8];
-        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal Filter(Pipeline pipeline, in BitMask mask) : this(pipeline)
+        internal Filter(Pipeline pipeline, in BitMask mask)
         {
+            m_pipeline = pipeline;
+            m_sparseSet = new SparseSet();
+            m_waiters = new (bool, int)[8];
             m_mask = mask;
         }
         
@@ -68,8 +60,6 @@ namespace UniversalEntities
 #endif
             m_locked = true;
             m_iterator = -1;
-            m_count = m_sparseSet.m_count;
-            m_entities = m_pipeline.m_sparseEntities;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -77,14 +67,14 @@ namespace UniversalEntities
         {
             ref int iterator = ref m_iterator;
         
-            if (++iterator >= m_count)
+            if (++iterator >= m_sparseSet.m_count)
             {
                 End();
                 entity = null;
                 return false;
             }
         
-            entity = m_entities[m_dense[iterator]];
+            entity = m_pipeline.m_sparseEntities[m_sparseSet.m_dense[iterator]];
             return true;
         }
 
@@ -106,9 +96,9 @@ namespace UniversalEntities
             
             for (int i = 0, i_max = m_waitersCount; i < i_max; i++)
             {
-                (bool action, int entity) = waiters[i];
+                (bool is_add, int entity) = waiters[i];
                 
-                if (action) sparse_set.Add(entity);
+                if (is_add) sparse_set.Add(entity);
                 else sparse_set.Remove(entity);
             }
 

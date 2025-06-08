@@ -19,9 +19,13 @@ namespace UniversalEntities
 
         public static Pipeline PipelineInstance
         {
-            get
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]get
             {
-                if (s_pipelineInstance == null) s_pipelineInstance = new Pipeline();
+                if (s_pipelineInstance == null)
+                {
+                    s_pipelineInstance = new Pipeline();
+                }
+                
                 return s_pipelineInstance;
             }
         }
@@ -34,16 +38,6 @@ namespace UniversalEntities
         
         void Awake()
         {
-            // if (s_validInstance != null && s_validInstance != this)
-            // {
-            //     Destroy(gameObject);
-            //     return;
-            // }
-            //
-            // s_validInstance = this;
-            
-            // DontDestroyOnLoad(gameObject);
-            
             m_pipeline = PipelineInstance;
             
             if (bootstrap != null)
@@ -79,10 +73,7 @@ namespace UniversalEntities
 
         void OnDestroy()
         {
-            // if (s_validInstance != null && s_validInstance != this)
-            {
-                s_pipelineInstance = null;
-            }
+            s_pipelineInstance = null;
         }
 
 #if UNITY_EDITOR
