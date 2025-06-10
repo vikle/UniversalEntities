@@ -1,3 +1,16 @@
 {
-	"name": "UniversalEntitiesRuntime"
+    "name": "UniversalEntitiesRuntime",
+    "rootNamespace": "",
+    "references": [
+        "UnityIL2CPP"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
