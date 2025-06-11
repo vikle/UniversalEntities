@@ -20,6 +20,12 @@ namespace UniversalEntities
             
             return entity;
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void InitializeEntity(Entity entity)
+        {
+            RunAfterEntityCreated(entity);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void DestroyEntity(Entity entity)

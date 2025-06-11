@@ -1,4 +1,6 @@
-using System.Reflection;
+#if DEBUG && !UNIVERSAL_ENTITIES_RELEASE
+using System.Linq;
+#endif
 
 namespace UniversalEntities
 {
@@ -7,7 +9,6 @@ namespace UniversalEntities
         internal void Init()
         {
             CastSystems();
-            InjectDependencies();
         }
 
         private void CastSystems()
@@ -19,42 +20,14 @@ namespace UniversalEntities
             ArrayTool.WhereCast(all_systems, out m_lateUpdateSystems);
             ArrayTool.WhereCast(all_systems, out m_entityInitializeSystems);
             ArrayTool.WhereCast(all_systems, out m_entityTerminateSystems);
-        }
-
-        private void InjectDependencies()
-        {
-            if (m_injectionsCache.Count == 0) return;
             
-            for (int i = 0, i_max = m_allSystems.Count; i < i_max; i++)
-            {
-                var system = m_allSystems[i];
-                InjectDependenciesIn(system);
-            }
-            
-            m_injectionsCache.Clear();
-            m_injectionsCache = null;
-        }
-
-        private void InjectDependenciesIn(object obj)
-        {
-            var bind_flags = (BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            
-            var obj_type = obj.GetType();
-            var obj_fields = obj_type.GetFields(bind_flags);
-
-            for (int i = 0, i_max = obj_fields.Length; i < i_max; i++)
-            {
-                var field = obj_fields[i];
-                var field_type = field.FieldType;
-                    
-                for (int j = 0, j_max = m_injectionsCache.Count; j < j_max; j++)
-                {
-                    object injection = m_injectionsCache[j];
-                    if (!field_type.IsInstanceOfType(injection)) continue;
-                    field.SetValue(obj, injection);
-                    break;
-                }
-            }
+#if DEBUG && !UNIVERSAL_ENTITIES_RELEASE
+            m_fixedUpdateSystemsNames = m_fixedUpdateSystems.Select(s => s.GetType().Name).ToArray();
+            m_updateSystemsNames = m_updateSystems.Select(s => s.GetType().Name).ToArray();
+            m_lateUpdateSystemsNames = m_lateUpdateSystems.Select(s => s.GetType().Name).ToArray();
+            m_entityInitializeSystemsNames = m_entityInitializeSystems.Select(s => s.GetType().Name).ToArray();
+            m_entityTerminateSystemsNames = m_entityTerminateSystems.Select(s => s.GetType().Name).ToArray();
+#endif
         }
     };
 }

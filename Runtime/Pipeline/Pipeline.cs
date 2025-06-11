@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 #if ENABLE_IL2CPP
@@ -22,17 +21,21 @@ namespace UniversalEntities
         int m_filtersCount;
         
         readonly List<ISystem> m_allSystems;
-        
         IFixedUpdateSystem[] m_fixedUpdateSystems;
         IUpdateSystem[] m_updateSystems;
         ILateUpdateSystem[] m_lateUpdateSystems;
         IEntityInitializeSystem[] m_entityInitializeSystems;
         IEntityTerminateSystem[] m_entityTerminateSystems;
         
-        ArrayList m_injectionsCache;
-        
         readonly object[] m_systemParams;
 
+#if DEBUG && !UNIVERSAL_ENTITIES_RELEASE
+        string[] m_fixedUpdateSystemsNames;
+        string[] m_updateSystemsNames;
+        string[] m_lateUpdateSystemsNames;
+        string[] m_entityInitializeSystemsNames;
+        string[] m_entityTerminateSystemsNames;
+#endif
         public int EntityCount
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -49,7 +52,6 @@ namespace UniversalEntities
         {
             m_sparseEntities = new Entity[64];
             m_allSystems = new List<ISystem>(128);
-            m_injectionsCache = new ArrayList(32);
             m_sparseSet = new AllocableSparseSet();
             
             m_filtersMap = new Dictionary<BitMask, Filter>(64);

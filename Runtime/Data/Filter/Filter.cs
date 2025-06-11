@@ -52,7 +52,7 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Begin()
         {
-#if DEBUG
+#if DEBUG && !UNIVERSAL_ENTITIES_RELEASE
             if (m_locked)
             {
                 throw new System.Exception("Try iterate locked filter.");
@@ -81,7 +81,7 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void End()
         {
-#if DEBUG
+#if DEBUG && !UNIVERSAL_ENTITIES_RELEASE
             if (!m_locked)
             {
                 throw new System.Exception("Try end unlocked filter.");

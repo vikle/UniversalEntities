@@ -18,27 +18,36 @@ namespace UniversalEntities
         {
             var system_type = typeof(T);
 
-#if (UNITY_2020_3_OR_NEWER && DEBUG)
+#if DEBUG && !UNIVERSAL_ENTITIES_RELEASE
             var all_constructors = system_type.GetConstructors();
+
+            if (all_constructors.Length == 0)
+            {
+                throw new Exception($"The '{system_type.Name}' must bee have constructor with one parameter 'Pipeline'.");
+            }
+            
             var main_constructor = all_constructors[0];
 
+#if UNITY_2020_3_OR_NEWER
             if (!Attribute.IsDefined(main_constructor, typeof(UnityEngine.Scripting.PreserveAttribute)))
             {
-                throw new Exception($"Not found 'UnityEngine.Scripting.PreserveAttribute' on Constructor in '{system_type.Name}'.");
+                throw new Exception($"Constructor in '{system_type.Name}' must bee have 'UnityEngine.Scripting.PreserveAttribute'.");
+            }
+#endif
+            var parameters = main_constructor.GetParameters();
+            
+            if (parameters.Length != 1)
+            {
+                throw new Exception($"Constructor in '{system_type.Name}' must bee have only one parameter.");
+            } 
+            
+            if (parameters[0].ParameterType != typeof(Pipeline))
+            {
+                throw new Exception($"Constructor in '{system_type.Name}' must bee have parameter type of 'Pipeline'.");
             }
 #endif
             object system = Activator.CreateInstance(system_type, m_systemParams);
             m_allSystems.Add((ISystem)system);
-            return this;
-        }
-
-        public Pipeline Inject<T>(T injection) where T : class
-        {
-            if (m_injectionsCache.Contains(injection) == false)
-            {
-                m_injectionsCache.Add(injection);
-            }
-            
             return this;
         }
     };

@@ -8,14 +8,18 @@ namespace UniversalEntities
         public T Trigger<T>() where T : class, IEvent, new()
         {
             var entity = CreateEntity();
-            return entity.AddComponent<T>();
+            var comp = entity.AddComponent<T>();
+            RunAfterEntityCreated(entity);
+            return comp;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Trigger<T>(out Entity entity) where T : class, IEvent, new()
         {
             entity = CreateEntity();
-            return entity.AddComponent<T>();
+            var comp = entity.AddComponent<T>();
+            RunAfterEntityCreated(entity);
+            return comp;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -24,6 +28,7 @@ namespace UniversalEntities
             var entity = CreateEntity();
             var promise = entity.AddComponent<T>();
             promise.State = EPromiseState.Pending;
+            RunAfterEntityCreated(entity);
             return promise;
         }
         
@@ -33,6 +38,7 @@ namespace UniversalEntities
             entity = CreateEntity();
             var promise = entity.AddComponent<T>();
             promise.State = EPromiseState.Pending;
+            RunAfterEntityCreated(entity);
             return promise;
         }
     };
