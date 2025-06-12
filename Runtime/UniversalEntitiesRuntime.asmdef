@@ -1,9 +1,7 @@
 {
     "name": "UniversalEntitiesRuntime",
     "rootNamespace": "",
-    "references": [
-        "UnityIL2CPP"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
