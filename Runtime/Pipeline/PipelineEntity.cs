@@ -11,7 +11,7 @@ namespace UniversalEntities
             
             var entity = EntityPool.Get();
             
-            entity.Init(this, entity_id);
+            entity.Construct(this, entity_id);
             
             ArrayTool.EnsureCapacity(ref m_sparseEntities, entity_id);
             m_sparseEntities[entity_id] = entity;
@@ -22,7 +22,7 @@ namespace UniversalEntities
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void InitializeEntity(Entity entity)
+        internal void InitializeEntity(Entity entity)
         {
             RunAfterEntityCreated(entity);
         }
@@ -35,11 +35,10 @@ namespace UniversalEntities
             int entity_id = entity.Id;
             
             RemoveEntityFromAllFilters(entity_id);
-            
-            RunBeforeEntityDestroyed(entity);
-            
             RemoveEntity(entity_id);
-            
+
+            RunBeforeEntityDestroyed(entity);
+
             entity.Dispose();
             EntityPool.Release(entity);
         }

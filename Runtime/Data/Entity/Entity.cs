@@ -25,7 +25,7 @@ namespace UniversalEntities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void Init(Pipeline pipeline, int id)
+        internal void Construct(Pipeline pipeline, int id)
         {
             Id = id;
             IsAlive = true;
@@ -42,6 +42,12 @@ namespace UniversalEntities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Initialize()
+        {
+            m_pipeline.InitializeEntity(this);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Destroy()
         {
             m_pipeline.DestroyEntity(this);
@@ -54,10 +60,17 @@ namespace UniversalEntities
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Mark<T>(EPromiseState newState) where T : class, IPromise
+        public void MarkFulfilled<T>() where T : class, IPromise
         {
             var promise = m_fragmentStack.Get<T>();
-            promise.State = newState;
+            promise.State = EPromiseState.Fulfilled;
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void MarkRejected<T>() where T : class, IPromise
+        {
+            var promise = m_fragmentStack.Get<T>();
+            promise.State = EPromiseState.Rejected;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
