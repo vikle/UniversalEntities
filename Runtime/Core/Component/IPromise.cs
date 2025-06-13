@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace UniversalEntities
+﻿namespace UniversalEntities
 {
     public enum EPromiseState : byte
     {

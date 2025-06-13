@@ -1,54 +1,38 @@
-﻿using System.Collections.Generic;
+﻿#if ENABLE_IL2CPP
+using Unity.IL2CPP.CompilerServices;
+#endif
 
 namespace UniversalEntities
 {
+#if ENABLE_IL2CPP
+    [Il2CppSetOption(Option.NullChecks, false)]
+    [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+#endif
     public sealed class PromiseCollector<T> : IUpdateSystem where T : class, IPromise
     {
-        public void OnUpdate(Pipeline pipeline)
+        readonly Filter m_filter;
+        
+#if UNITY_2020_3_OR_NEWER
+        [UnityEngine.Scripting.Preserve]
+#endif
+        public PromiseCollector(Pipeline pipeline)
         {
-            
+            m_filter = pipeline.Query.With<T>().Build();
         }
         
-        // protected void OnExecute(Pipeline pipeline, IEntity entity)
-        // {
-        //     var promise = new T();
-        //     
-        //     List<IEvent> resolve;
-        //     var state = promise.State;
-        //
-        //     switch (state)
-        //     {
-        //         case EPromiseState.Fulfilled:
-        //         case EPromiseState.Rejected: 
-        //             resolve = promise.Resolve;
-        //             break;
-        //             
-        //         default: return;
-        //     }
-        //         
-        //     switch (state)
-        //     {
-        //         case EPromiseState.Fulfilled:
-        //             var target = promise.Target;
-        //             for (int i = 0, i_max = resolve.Count; i < i_max; i++)
-        //             {
-        //                 target.AddComponent(resolve[i]);
-        //             }
-        //             break;
-        //         case EPromiseState.Rejected: 
-        //             for (int i = 0, i_max = resolve.Count; i < i_max; i++)
-        //             {
-        //                 FragmentPool.Release(resolve[i]);
-        //             }
-        //             break; 
-        //     }
-        //
-        //     resolve.Clear();
-        //     
-        //     promise.Target = null;
-        //     promise.State = EPromiseState.Pending;
-        //
-        //     entity.RemoveComponent(promise);
-        // }
+        public void OnUpdate(Pipeline pipeline)
+        {
+            if (m_filter.IsEmpty) return;
+            
+            for (m_filter.Begin(); m_filter.TryIterate(out var entity);)
+            {
+                if (entity.GetComponent<T>().State == EPromiseState.Pending)
+                {
+                    continue;
+                }
+                
+                pipeline.DestroyEntity(entity);
+            }
+        }
     };
 }
