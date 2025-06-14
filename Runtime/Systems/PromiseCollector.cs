@@ -24,7 +24,7 @@ namespace UniversalEntities
         {
             if (m_filter.IsEmpty) return;
             
-            for (m_filter.Begin(); m_filter.TryIterate(out var entity);)
+            foreach (var entity in m_filter)
             {
                 if (entity.GetComponent<T>().State == EPromiseState.Pending)
                 {

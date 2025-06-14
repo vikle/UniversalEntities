@@ -23,8 +23,8 @@ namespace UniversalEntities
         public void OnUpdate(Pipeline pipeline)
         {
             if (m_filter.IsEmpty) return;
-            
-            for (m_filter.Begin(); m_filter.TryIterate(out var entity);)
+
+            foreach (var entity in m_filter)
             {
                 pipeline.DestroyEntity(entity);
             }

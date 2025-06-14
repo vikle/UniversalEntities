@@ -14,13 +14,11 @@ namespace UniversalEntities
     {
         readonly BitMask m_mask;
         readonly SparseSet m_sparseSet;
-
         readonly Pipeline m_pipeline;
         
-        int m_iterator;
         bool m_locked;
-        int m_waitersCount;
-        (bool, int)[] m_waiters;
+        internal int m_waitersCount;
+        internal (bool, int)[] m_waiters;
         
         public int EntityCount
         {
@@ -50,7 +48,7 @@ namespace UniversalEntities
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Begin()
+        internal void Lock()
         {
 #if DEBUG && !UNIVERSAL_ENTITIES_RELEASE
             if (m_locked)
@@ -59,27 +57,10 @@ namespace UniversalEntities
             }
 #endif
             m_locked = true;
-            m_iterator = -1;
-        }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryIterate(out Entity entity)
-        {
-            ref int iterator = ref m_iterator;
-        
-            if (++iterator >= m_sparseSet.m_count)
-            {
-                End();
-                entity = null;
-                return false;
-            }
-        
-            entity = m_pipeline.m_sparseEntities[m_sparseSet.m_dense[iterator]];
-            return true;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void End()
+        internal void Unlock()
         {
 #if DEBUG && !UNIVERSAL_ENTITIES_RELEASE
             if (!m_locked)
@@ -88,21 +69,6 @@ namespace UniversalEntities
             }
 #endif
             m_locked = false;
-
-            if (m_waitersCount == 0) return;
-            
-            var waiters = m_waiters;
-            var sparse_set = m_sparseSet;
-            
-            for (int i = 0, i_max = m_waitersCount; i < i_max; i++)
-            {
-                (bool is_add, int entity) = waiters[i];
-                
-                if (is_add) sparse_set.Add(entity);
-                else sparse_set.Remove(entity);
-            }
-
-            m_waitersCount = 0;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -117,24 +83,26 @@ namespace UniversalEntities
             if (m_locked)
             {
                 ArrayTool.Push(ref m_waiters, ref m_waitersCount, (true, entityId));
-                return;
             }
-
-            m_sparseSet.Add(entityId);
+            else
+            {
+                m_sparseSet.Add(entityId);
+            }
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void RemoveEntity(int entityId)
         {
             if (m_locked)
             {
                 ArrayTool.Push(ref m_waiters, ref m_waitersCount, (false, entityId));
-                return;
             }
-
-            m_sparseSet.Remove(entityId);
+            else
+            {
+                m_sparseSet.Remove(entityId);
+            }
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(int entityId)
         {
@@ -144,7 +112,7 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public FilterEnumerator GetEnumerator()
         {
-            return new FilterEnumerator(this);
+            return new FilterEnumerator(this, m_sparseSet, m_pipeline.m_sparseEntities);
         }
     };
 }
