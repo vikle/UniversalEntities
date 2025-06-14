@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 #if ENABLE_IL2CPP
-    using Unity.IL2CPP.CompilerServices;
+using Unity.IL2CPP.CompilerServices;
 #endif
 
 namespace UniversalEntities
@@ -11,7 +11,7 @@ namespace UniversalEntities
     [Il2CppSetOption(Option.NullChecks, false)]
     [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
-    public abstract class ObjectPool<TType> where TType : class
+    internal abstract class ObjectPool<TType> where TType : class
     {
         static readonly Dictionary<Type, Stack<TType>> sr_pool = new Dictionary<Type, Stack<TType>>(64);
         
@@ -40,7 +40,7 @@ namespace UniversalEntities
         {
             var pool_type = instance.GetType();
 
-            if (sr_pool.TryGetValue(pool_type, out var stack) == false)
+            if (!sr_pool.TryGetValue(pool_type, out var stack))
             {
                 stack = new Stack<TType>();
                 sr_pool[pool_type] = stack;
