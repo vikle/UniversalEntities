@@ -2,8 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
+#if ENABLE_IL2CPP
+using Unity.IL2CPP.CompilerServices;
+#endif
+
 namespace UniversalEntities
 {
+#if ENABLE_IL2CPP
+    [Il2CppSetOption(Option.NullChecks, false)]
+    [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+#endif
     internal static class ArrayTool
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -25,7 +33,6 @@ namespace UniversalEntities
             value = default;
             return false;
         }
-
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static void EnsureCapacity<T>(ref T[] array, int minCapacity)

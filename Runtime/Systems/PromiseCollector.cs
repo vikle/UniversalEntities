@@ -8,7 +8,7 @@ namespace UniversalEntities
     [Il2CppSetOption(Option.NullChecks, false)]
     [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
-    public sealed class PromiseCollector<T> : IUpdateSystem where T : class, IPromise
+    public sealed class PromiseCollector<T> : ICollectSystem where T : class, IPromise
     {
         readonly Filter m_filter;
         
@@ -20,7 +20,7 @@ namespace UniversalEntities
             m_filter = pipeline.Query.With<T>().Build();
         }
         
-        public void OnUpdate(Pipeline pipeline)
+        public void OnCollect(Pipeline pipeline)
         {
             if (m_filter.IsEmpty) return;
             
