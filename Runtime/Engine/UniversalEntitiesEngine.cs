@@ -13,21 +13,30 @@ namespace UniversalEntities
     [DefaultExecutionOrder(-100), DisallowMultipleComponent]
     public sealed class UniversalEntitiesEngine : MonoBehaviour
     {
-        public UniversalEntitiesBootstrap bootstrap;
+        [SerializeField]bool m_keepAlive = true;
+        [SerializeField]UniversalEntitiesBootstrap m_bootstrap;
         
         Pipeline m_pipeline;
         
         void Awake()
         {
+            PipelineSingleton.Initialize();
             m_pipeline = PipelineSingleton.Get;
             
-            if (bootstrap != null)
+            if (m_bootstrap != null)
             {
-                bootstrap.OnBootstrap(m_pipeline);
+                m_bootstrap.OnBootstrap(m_pipeline);
             }
             
             m_pipeline.Init();
             m_pipeline.RunAwake();
+
+            gameObject.AddComponent<UniversalEntitiesCollector>();
+
+            if (m_keepAlive)
+            {
+                DontDestroyOnLoad(gameObject);
+            }
         }
 
         void Start()
@@ -50,14 +59,8 @@ namespace UniversalEntities
         void LateUpdate()
         {
             m_pipeline.RunLateUpdate();
-            m_pipeline.RunCollect();
         }
-
-        void OnDestroy()
-        {
-            PipelineSingleton.Dispose();
-        }
-
+        
 #if UNITY_EDITOR
         [UnityEditor.MenuItem("Tools/Universal Entities/Create Engine", true)]
         private static bool CanCreateEngine()

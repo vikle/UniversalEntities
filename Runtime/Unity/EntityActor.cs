@@ -48,6 +48,8 @@ namespace UniversalEntities
 
         public void InitEntity()
         {
+            if (!PipelineSingleton.IsAlive) return;
+            
             if (EntityRef != null) return;
 
             InitBakers();
@@ -83,6 +85,8 @@ namespace UniversalEntities
 
         public void DisposeEntity()
         {
+            if (!PipelineSingleton.IsAlive) return;
+            
             var entity = EntityRef;
             
             if (entity == null) return;

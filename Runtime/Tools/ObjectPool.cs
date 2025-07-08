@@ -48,5 +48,10 @@ namespace UniversalEntities
             
             stack.Push(instance);
         }
+
+        internal static void Dispose()
+        {
+            sr_pool.Clear();
+        }
     };
 }

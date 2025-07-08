@@ -4,24 +4,28 @@ namespace UniversalEntities
 {
     public static class PipelineSingleton
     {
-        static Pipeline s_pipeline;
+        public static bool IsAlive
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]private set;
+        }
 
         public static Pipeline Get
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]get
-            {
-                if (s_pipeline == null)
-                {
-                    s_pipeline = new Pipeline();
-                }
-                
-                return s_pipeline;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]private set;
+        }
+
+        internal static void Initialize()
+        {
+            IsAlive = true;
+            Get = new Pipeline();
         }
 
         internal static void Dispose()
         {
-            s_pipeline = null;
+            IsAlive = false;
+            Get = null;
         }
     };
 }
