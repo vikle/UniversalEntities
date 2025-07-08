@@ -10,33 +10,15 @@ namespace UniversalEntities
     [Il2CppSetOption(Option.NullChecks, false)]
     [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
-    [DefaultExecutionOrder(-100), DisallowMultipleComponent]
+    [DefaultExecutionOrder(-50), DisallowMultipleComponent]
     public sealed class UniversalEntitiesEngine : MonoBehaviour
     {
-        [SerializeField]bool m_keepAlive = true;
-        [SerializeField]UniversalEntitiesBootstrap m_bootstrap;
-        
         Pipeline m_pipeline;
         
         void Awake()
         {
-            PipelineSingleton.Initialize();
             m_pipeline = PipelineSingleton.Get;
-            
-            if (m_bootstrap != null)
-            {
-                m_bootstrap.OnBootstrap(m_pipeline);
-            }
-            
-            m_pipeline.Init();
             m_pipeline.RunAwake();
-
-            gameObject.AddComponent<UniversalEntitiesCollector>();
-
-            if (m_keepAlive)
-            {
-                DontDestroyOnLoad(gameObject);
-            }
         }
 
         void Start()
@@ -60,26 +42,5 @@ namespace UniversalEntities
         {
             m_pipeline.RunLateUpdate();
         }
-        
-#if UNITY_EDITOR
-        [UnityEditor.MenuItem("Tools/Universal Entities/Create Engine", true)]
-        private static bool CanCreateEngine()
-        {
-            return (FindObjectOfType<UniversalEntitiesEngine>() == null);
-        }
-
-        [UnityEditor.MenuItem("Tools/Universal Entities/Create Engine")]
-        private static void CreateEngine()
-        {
-            var obj_type = typeof(UniversalEntitiesEngine);
-            
-            var root_obj = new GameObject(obj_type.Name, obj_type)
-            {
-                isStatic = true
-            };
-            
-            UnityEditor.Selection.activeObject = root_obj;
-        }
-#endif
     };
 }
