@@ -18,6 +18,7 @@ namespace UniversalEntities
             ArrayTool.WhereCast(all_systems, out m_updateSystems);
             ArrayTool.WhereCast(all_systems, out m_fixedUpdateSystems);
             ArrayTool.WhereCast(all_systems, out m_lateUpdateSystems);
+            ArrayTool.WhereCast(all_systems, out m_collectSystems);
             ArrayTool.WhereCast(all_systems, out m_entityInitializeSystems);
             ArrayTool.WhereCast(all_systems, out m_entityTerminateSystems);
             
@@ -25,8 +26,6 @@ namespace UniversalEntities
             m_fixedUpdateSystemsNames = m_fixedUpdateSystems.Select(s => s.GetType().Name).ToArray();
             m_updateSystemsNames = m_updateSystems.Select(s => s.GetType().Name).ToArray();
             m_lateUpdateSystemsNames = m_lateUpdateSystems.Select(s => s.GetType().Name).ToArray();
-            m_entityInitializeSystemsNames = m_entityInitializeSystems.Select(s => s.GetType().Name).ToArray();
-            m_entityTerminateSystemsNames = m_entityTerminateSystems.Select(s => s.GetType().Name).ToArray();
 #endif
         }
     };

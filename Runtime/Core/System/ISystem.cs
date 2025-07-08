@@ -29,6 +29,11 @@
         void OnLateUpdate(Pipeline pipeline);
     };
     
+    public interface ICollectSystem : ISystem
+    {
+        void OnCollect(Pipeline pipeline);
+    };
+    
     public interface IEntityInitializeSystem : ISystem
     {
         void OnAfterEntityCreated(Pipeline pipeline, Entity entity);

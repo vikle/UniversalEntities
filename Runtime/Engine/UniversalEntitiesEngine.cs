@@ -1,5 +1,3 @@
-using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 #if ENABLE_IL2CPP
@@ -15,30 +13,13 @@ namespace UniversalEntities
     [DefaultExecutionOrder(-100), DisallowMultipleComponent]
     public sealed class UniversalEntitiesEngine : MonoBehaviour
     {
-        static Pipeline s_pipelineInstance;
-
-        public static Pipeline PipelineInstance
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]get
-            {
-                if (s_pipelineInstance == null)
-                {
-                    s_pipelineInstance = new Pipeline();
-                }
-                
-                return s_pipelineInstance;
-            }
-        }
-        
         public UniversalEntitiesBootstrap bootstrap;
-
-        Pipeline m_pipeline;
         
-        static UniversalEntitiesEngine s_validInstance;
+        Pipeline m_pipeline;
         
         void Awake()
         {
-            m_pipeline = PipelineInstance;
+            m_pipeline = PipelineSingleton.Get;
             
             if (bootstrap != null)
             {
@@ -69,48 +50,32 @@ namespace UniversalEntities
         void LateUpdate()
         {
             m_pipeline.RunLateUpdate();
+            m_pipeline.RunCollect();
         }
 
         void OnDestroy()
         {
-            s_pipelineInstance = null;
+            PipelineSingleton.Dispose();
         }
 
 #if UNITY_EDITOR
-        [UnityEditor.MenuItem("Tools/Universal Entities/Create/Engine", true)]
+        [UnityEditor.MenuItem("Tools/Universal Entities/Create Engine", true)]
         private static bool CanCreateEngine()
         {
             return (FindObjectOfType<UniversalEntitiesEngine>() == null);
         }
 
-        [UnityEditor.MenuItem("Tools/Universal Entities/Create/Engine")]
+        [UnityEditor.MenuItem("Tools/Universal Entities/Create Engine")]
         private static void CreateEngine()
         {
             var obj_type = typeof(UniversalEntitiesEngine);
-            CreateGameObject(obj_type);
-        }
-
-        [UnityEditor.MenuItem("Tools/Universal Entities/Create/Bootstrap", true)]
-        private static bool CanCreateBootstrap()
-        {
-            return (FindObjectOfType<UniversalEntitiesBootstrap>() == null);
-        }
-
-        [UnityEditor.MenuItem("Tools/Universal Entities/Create/Bootstrap")]
-        private static void CreateBootstrap()
-        {
-            var obj_type = typeof(UniversalEntitiesBootstrap);
-            CreateGameObject(obj_type);
-        }
-
-        private static void CreateGameObject(Type objType)
-        {
-            var main_obj = new GameObject(objType.Name, objType)
+            
+            var root_obj = new GameObject(obj_type.Name, obj_type)
             {
                 isStatic = true
             };
             
-            UnityEditor.Selection.activeObject = main_obj;
+            UnityEditor.Selection.activeObject = root_obj;
         }
 #endif
     };

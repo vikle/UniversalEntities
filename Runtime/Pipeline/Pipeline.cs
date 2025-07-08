@@ -24,6 +24,7 @@ namespace UniversalEntities
         IFixedUpdateSystem[] m_fixedUpdateSystems;
         IUpdateSystem[] m_updateSystems;
         ILateUpdateSystem[] m_lateUpdateSystems;
+        ICollectSystem[] m_collectSystems;
         IEntityInitializeSystem[] m_entityInitializeSystems;
         IEntityTerminateSystem[] m_entityTerminateSystems;
         
@@ -33,8 +34,6 @@ namespace UniversalEntities
         string[] m_fixedUpdateSystemsNames;
         string[] m_updateSystemsNames;
         string[] m_lateUpdateSystemsNames;
-        string[] m_entityInitializeSystemsNames;
-        string[] m_entityTerminateSystemsNames;
 #endif
         public int EntityCount
         {

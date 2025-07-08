@@ -31,11 +31,8 @@ namespace UniversalEntities
         
         EntityActorBaker[] m_backers;
 
-        Pipeline m_pipeline;
-
         void Awake()
         {
-            m_pipeline = UniversalEntitiesEngine.PipelineInstance;
             InitBakers();
         }
 
@@ -52,10 +49,11 @@ namespace UniversalEntities
         public void InitEntity()
         {
             if (EntityRef != null) return;
-            
+
             InitBakers();
-            
-            var entity = m_pipeline.CreateEntity();
+
+            var pipeline = PipelineSingleton.Get;
+            var entity = pipeline.CreateEntity();
 
             switch (dataComponent)
             {
@@ -75,7 +73,7 @@ namespace UniversalEntities
             
             for (int i = 0, i_max = m_backers.Length; i < i_max; i++)
             {
-                m_backers[i].OnAfterEntityCreated(m_pipeline, EntityRef, this);
+                m_backers[i].OnAfterEntityCreated(pipeline, entity, this);
             }
             
             entity.Initialize();
@@ -89,12 +87,14 @@ namespace UniversalEntities
             
             if (entity == null) return;
             
+            var pipeline = PipelineSingleton.Get;
+            
             for (int i = 0, i_max = m_backers.Length; i < i_max; i++)
             {
-                m_backers[i].OnBeforeEntityDestroyed(m_pipeline, EntityRef, this);
+                m_backers[i].OnBeforeEntityDestroyed(pipeline, entity, this);
             }
             
-            m_pipeline.DestroyEntity(entity);
+            pipeline.DestroyEntity(entity);
             
             EntityRef = null;
         }
