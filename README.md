@@ -24,15 +24,20 @@
 > [This is only one official working version.](https://github.com/vikle/UniversalEntities.git) All another versions are unofficial clones and can be contains unknown third-party code. Using these sources is strongly discouraged and should be done at your own risk.
 
 ## 📖 Table of Contents
-* [Setup](#-setup4)
+* [Setup](#-setup)
+* [Prepare](#-setup)
 * [Entity](#-setup)
-  * [Initialize](#-setup3)
-  * [Terminate](#-setup)
   * [Actor](#-setup)
   * [ActorBaker](#-setup)
+  * [Initialize](#-setup3)
+  * [Terminate](#-setup)
 * [Component](#-setup)
   * [Resettable](#-setup)
   * [Unmanaged](#-setup)
+  * [ObjectRef<T>](#-setup)
+* [Promise](#-setup)
+* [Event](#-setup)
+* [Filter](#-setup)
 * [System](#-setup)
   * [Awake](#-setup)
   * [Start](#-setup)
@@ -40,9 +45,6 @@
   * [Update](#-setup)
   * [Late Update](#-setup)    
   * [Collect](#-setup)
-* [Promise](#-setup)
-* [Event](#-setup)
-* [Filter](#-setup)
 * [Pipeline](#-setup)
 * [Starter](#-setup)
 * [Bootstrap](#-setup)
@@ -51,30 +53,127 @@
 ## ✏️ Setup
 Open the `Window -> Package Manager`, select the `Add package from git URL...` and paste [https://github.com/vikle/UniversalEntities.git](https://github.com/vikle/UniversalEntities.git)
 
+## ✏️ Prepare
+Create the Starter from `Tools -> Universal Entities -> Create Starter`
 
 ## ✏️ Entity
+Reference type object. Allocated if needed or reused from pool. Contains references of components.
+```c#
+var pipeline = PipelineSingleton.Get;
+var entity = pipeline.CreateEntity();
 
+entity.AddComponent<CharacterMarker>();
+
+// Optionally, calls all inheritors of IEntityInitializeSystem
+entity.Initialize();
+```
 
 ## ✏️ Component
+Reference type object. Allocated if needed or reused from pool. Store data and uses as markers for filtering entities.
+```c#
+public sealed class Health : IComponent
+{
+    public float value;
+};
+```
+```c#
+public sealed class Health : IResettableComponent
+{
+    public float value;
 
-
-
-
-## ✏️ System
-
-
+    // Called after component added
+    void IResettableComponent.OnReset()
+    {
+       value = 1f;
+    } 
+};
+```
 
 ## ✏️ Promise
 
+```c#
+public sealed class SpawnCharacterPromise : IPromise
+{
+     public EPromiseState State { get; set; }
+     public GameObject prefab;
+     public Vector3 position;
+     public Quaternion rotation;
+};
+
+var spawnPromise = pipeline.Then<SpawnCharacterPromise>();
+spawnPromise.prefab = characterPrefab;
+spawnPromise.position = spawnPoint.transform.position;
+spawnPromise.rotation = spawnPoint.transform.rotation;
+```
+
 ## ✏️ Event
+
+```c#
+public sealed class CharacterSpawnedEvent : IEvent
+{ 
+     public Entity character;
+};
+
+var spawnEvent = pipeline.Trigger<CharacterSpawnedEvent>();
+spawnEvent.character = entity;
+```
 
 ## ✏️ Filter
 
+```c#
+pipeline.Query.With<CharacterMarker>().Build();
+pipeline.Query.With<SpawnCharacterPromise>().Build();
+pipeline.Query.With<CharacterSpawnedEvent>().Build();
+```
+
+## ✏️ System
+
+```c#
+public sealed class SpawnCharacterSystem : IUpdateSystem
+{
+    readonly Filter m_filter;
+
+    [Preserve]public SpawnCharacterSystem(Pipeline pipeline)
+    {
+        m_filter = pipeline.Query.With<SpawnCharacterPromise>().Build();
+    }
+
+    public void OnUpdate(Pipeline pipeline)
+    {
+        // Best practice for optimazation
+        if (m_filter.IsEmpty) return;
+
+        foreach (var promiseEntity in m_filter)
+        {
+            var promise = promiseEntity.GetComponent<SpawnCharacterPromise>();
+            promise.State = EPromiseState.Fulfilled;
+
+            var prefabClone = GameObjectPool.Instantiate(request.prefab, request.position, request.rotation);
+            var actor = prefabClone.GetComponent<EntityActor>();
+
+            // Calls for initialize entity and call bakers
+            actor.InitEntity();
+
+            var characterEntity = actor.EntityRef;
+
+            var spawnEvent = pipeline.Trigger<CharacterSpawnedEvent>();
+            spawnEvent.character = characterEntity;
+        }
+    }
+};
+```
+
 ## ✏️ Pipeline
+```c#
+// Pipeline
+```
 
 ## ✏️ Starter
 
 ## ✏️ Bootstrap
+```c#
+// Bootstrap
+```
 
 ## ✏️ Setup
 
