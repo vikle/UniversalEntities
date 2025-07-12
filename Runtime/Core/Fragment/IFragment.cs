@@ -8,6 +8,11 @@
     {
     };
     
+    public interface IResettableComponent : IComponent
+    {
+        void OnReset();
+    };
+    
     public interface IUnmanagedComponent : IComponent
     {
     };

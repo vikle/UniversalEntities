@@ -81,6 +81,11 @@ namespace UniversalEntities
             pointer = RestoreDenseIndex();
             m_dense[pointer] = instance;
 
+            if (instance is IResettableComponent resettable)
+            {
+                resettable.OnReset();
+            }
+
             return true;
         }
 
