@@ -28,6 +28,8 @@
 * [Entity](#-setup)
   * [Initialize](#-setup3)
   * [Terminate](#-setup)
+  * [Actor](#-setup)
+  * [ActorBaker](#-setup)
 * [Component](#-setup)
   * [Resettable](#-setup)
   * [Unmanaged](#-setup)
@@ -40,17 +42,43 @@
   * [Collect](#-setup)
 * [Promise](#-setup)
 * [Event](#-setup)
-* [Setup](#-setup)
-* [Setup](#-setup)
-* [Setup](#-setup)
-* [Setup](#-setup)
-* [Setup](#-setup)
-* [Setup](#-setup)
+* [Filter](#-setup)
+* [Pipeline](#-setup)
+* [Starter](#-setup)
+* [Bootstrap](#-setup)
+
 
 ## ✏️ Setup
 Open the `Window -> Package Manager`, select the `Add package from git URL...` and paste [https://github.com/vikle/UniversalEntities.git](https://github.com/vikle/UniversalEntities.git)
 
 
+## ✏️ Entity
+
+
+## ✏️ Component
+
+
+
+
+## ✏️ System
+
+
+
+## ✏️ Promise
+
+## ✏️ Event
+
+## ✏️ Filter
+
+## ✏️ Pipeline
+
+## ✏️ Starter
+
+## ✏️ Bootstrap
+
+## ✏️ Setup
+
+## ✏️ Setup
 
 
 
