@@ -22,6 +22,7 @@ namespace UniversalEntities
         };
         
         public EDataComponent dataComponent;
+        public bool optimizeFiltersUpdating = true;
         
         public Entity EntityRef
         {
@@ -57,6 +58,13 @@ namespace UniversalEntities
             var pipeline = PipelineSingleton.Get;
             var entity = pipeline.CreateEntity();
 
+            bool optimize_filters = optimizeFiltersUpdating;
+            
+            if (optimize_filters)
+            {
+                pipeline.DisableFiltersUpdating();
+            }
+            
             switch (dataComponent)
             {
                 case EDataComponent.SingleEntityActorData:
@@ -65,10 +73,13 @@ namespace UniversalEntities
                     data.transform = transform;
                     data.actor = this;
                     break;
+                
                 case EDataComponent.SeparatedObjectRef: 
+                    if (!optimize_filters) pipeline.DisableFiltersUpdating();
                     entity.AddComponent<ObjectRef<GameObject>>().Target = gameObject;
                     entity.AddComponent<ObjectRef<Transform>>().Target = transform;
                     entity.AddComponent<ObjectRef<EntityActor>>().Target = this;
+                    if (!optimize_filters) pipeline.EnableFiltersUpdatingAndCallUpdate(entity);
                     break;
                 default: break;
             }
@@ -80,6 +91,11 @@ namespace UniversalEntities
             
             entity.Initialize();
 
+            if (optimize_filters)
+            {
+                pipeline.EnableFiltersUpdatingAndCallUpdate(entity);
+            }
+            
             EntityRef = entity;
         }
 
