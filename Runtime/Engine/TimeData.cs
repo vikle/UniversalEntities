@@ -47,7 +47,8 @@ namespace UniversalEntities
             [MethodImpl(MethodImplOptions.AggressiveInlining)]private set;
         }
         
-        public static void OnUpdate()
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static void OnUpdate()
         {
             Time = UTime.time;
             UnscaledTime = UTime.unscaledTime;
@@ -55,7 +56,8 @@ namespace UniversalEntities
             UnscaledDeltaTime = UTime.unscaledDeltaTime;
         }
         
-        public static void OnFixedUpdate()
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static void OnFixedUpdate()
         {
             FixedTime = UTime.fixedTime;
             FixedUnscaledTime = UTime.fixedUnscaledTime;
