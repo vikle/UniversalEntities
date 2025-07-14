@@ -39,10 +39,7 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void OnEntityFragmentAdded(Entity entity)
         {
-            if (AutoUpdateFilters)
-            {
-                UpdateFilters(entity);
-            }
+            UpdateFiltersIfEnabled(entity);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -54,14 +51,39 @@ namespace UniversalEntities
                 return;
             }
 
-            if (AutoUpdateFilters)
+            UpdateFiltersIfEnabled(entity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void DisableFiltersUpdating()
+        {
+            IsFiltersUpdatingEnabled = false;
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void EnableFiltersUpdating()
+        {
+            IsFiltersUpdatingEnabled = true;
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void EnableFiltersUpdatingAndCallUpdate(Entity entity)
+        {
+            IsFiltersUpdatingEnabled = true;
+            ForceUpdateFilters(entity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void UpdateFiltersIfEnabled(Entity entity)
+        {
+            if (IsFiltersUpdatingEnabled)
             {
-                UpdateFilters(entity);
+                ForceUpdateFilters(entity);
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void UpdateFilters(Entity entity)
+        public void ForceUpdateFilters(Entity entity)
         {
             int entity_id = entity.Id;
             ref readonly var entity_mask = ref entity.Mask;

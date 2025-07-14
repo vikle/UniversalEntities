@@ -41,10 +41,10 @@ namespace UniversalEntities
             get => m_sparseSet.m_count;
         }
         
-        public bool AutoUpdateFilters
+        public bool IsFiltersUpdatingEnabled
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]get;
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]set;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]private set;
         }
         
         public Pipeline()
@@ -58,7 +58,7 @@ namespace UniversalEntities
             
             m_systemParams = new object[]{this};
 
-            AutoUpdateFilters = true;
+            IsFiltersUpdatingEnabled = true;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
