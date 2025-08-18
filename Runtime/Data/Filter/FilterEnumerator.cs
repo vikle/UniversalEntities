@@ -45,14 +45,14 @@ namespace UniversalEntities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool MoveNext()
         {
-            if (++m_iterator >= m_filterDenseCount)
+            if (++m_iterator < m_filterDenseCount)
             {
-                m_currentValue = null;
-                return false;
+                m_currentValue = m_sparseEntities[m_filterDense[m_iterator]];
+                return true;
             }
         
-            m_currentValue = m_sparseEntities[m_filterDense[m_iterator]];
-            return true;
+            m_currentValue = null;
+            return false;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
